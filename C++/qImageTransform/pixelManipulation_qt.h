@@ -5,19 +5,14 @@
 #include <primitive_types.h>
 #include <QImage>
 
-enum interpolationKernel
-{
-    HAAR,
-    BILINEAR,
-    CUBIC
-};
+enum interpolationKernel{ HAAR, BILINEAR, CUBIC };
 
 QRgb getValue( const QImage& image , uint32 iIndex , uint32 jIndex );
 real kernelHaar( real x );
 real kernelBilinear( real x );
 real kernelCubic( real x );
 real max( real x , real y);
-QRgb pixelValue( QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR );
+QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR );
 
 
 QRgb getValue( const QImage& image , int iIndex , int jIndex )
@@ -62,7 +57,7 @@ real max( real x , real y)
     return ( x > y ) ? x : y ;
 }
 
-QRgb pixelValue(QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR )
+QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR )
 {
     real x = P.x();
     real y = P.y();
