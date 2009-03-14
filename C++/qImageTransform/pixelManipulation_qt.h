@@ -166,6 +166,7 @@ QRgb pixelValue(QImage& image , QPointF P , interpolationKernel kernel =  BILINE
             vB += b*tmpV*tmpH;
             return QRgb( vR,  vG,  vB );
             break;
+ ////////////////\\\\\\\\\\\\\\\\\\\
         case CUBIC:
             // TODO
             return QRgb( vR,  vG,  vB );
