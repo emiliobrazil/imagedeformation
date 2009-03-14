@@ -85,7 +85,7 @@ void qMyLine::insertPoint( QPointF p , uint32 d )
         {
             tmp[i] = this->_points[i];
         }
-        tmp[d] = p;
+        tmp[d] = p ;
         for( uint32 i = d+1 ; i < numberOfPoints ; ++i )
         {
             tmp[i] = this->_points[i-1];

@@ -16,6 +16,6 @@ SOURCES += maskImage_qt.cpp \
     qimagetransform.cpp \
     controlpainel_qt.cpp
 FORMS += controlpainel_qt.ui
-INCPATH += /home/emilio/Documents/IMPA_projetos/Tese_doutorado/implementacao/bibliotecas/eVector/
-LIBS += -L/home/emilio/Documents/IMPA_projetos/Tese_doutorado/implementacao/bibliotecas/eVector/ \
+INCPATH += /home/emilio/Documents/IMPA_projetos/Tese_doutorado/implementacao/trunk/bibliotecas/eVector/
+LIBS += -L/home/emilio/Documents/IMPA_projetos/Tese_doutorado/implementacao/trunk/bibliotecas/eVector/ \
     -leVector
