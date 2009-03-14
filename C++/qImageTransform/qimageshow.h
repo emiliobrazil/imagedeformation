@@ -64,6 +64,8 @@ private:
 
     QImage _maskF;
 
+    QImage _finalImage;
+
     QPointF _pointTesteA;
     QPointF _pointTesteB;
 

@@ -3,7 +3,10 @@
 
 #include <math.h>
 #include <primitive_types.h>
+#include "qMyLine.h"
 #include <QImage>
+#include <QVector>
+#include <QPolygonF>
 
 enum interpolationKernel{ HAAR, BILINEAR, CUBIC };
 
@@ -11,53 +14,53 @@ QRgb getValue( const QImage& image , uint32 iIndex , uint32 jIndex );
 real kernelHaar( real x );
 real kernelBilinear( real x );
 real kernelCubic( real x );
-real max( real x , real y);
 QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR );
+void transformImage( const QImage& image , QImage& finalImage , const QImage& maskF , qMyLine lineC );
+
+real max( real x , real y){ return ( x > y ) ? x : y ; }
+real mim( real x , real y){ return ( x < y ) ? x : y ; }
+
 
 
 QRgb getValue( const QImage& image , int iIndex , int jIndex )
 {
-    m = image.width();
-    n = image.height();
+    int m = image.width();
+    int n = image.height();
     if (iIndex < 0 ) iIndex = 0;
     if (jIndex < 0 ) jIndex = 0;
     if (iIndex > m-1 ) iIndex = m;
-    if (iIndex > n-1 ) iIndex = n;
+    if (jIndex > n-1 ) iIndex = n;
 
-    return image.pixel( i , j );
+    return image.pixel( iIndex , jIndex );
 }
 
 real kernelHaar( real x )
 {
-    if (x<-.5f) return 0f;
-    else if (x<.5f) return 1f;
-    return 0f;
+    if ( x<-.5f ) return 0.0f;
+    else if (x<.5f) return 1.0f;
+    return 0.0f;
 }
 
 real kernelBilinear( real x )
 {
-    if (x<-1f) return 0f;
-    else if (x<0f) return 1+x;
-    else if  (x<1f) return 1-x;
-    return 0f;
+    if (x<-1.0f) return 0.0f;
+    else if (x<0.0f) return 1.0f+x;
+    else if  (x<1.0f) return 1.0f-x;
+    return 0.0f;
 }
 
 real kernelCubic( real x )
 {
-    if (x<-2f) return 0;
-    else if (x<-1f) return max( 4+8*x+5*x*x+x*x*x , 0f );
-    else if (x< 0f) return max( 1-2*x*x-x*x*x , 0f );
-    else if (x< 1f) return max( 1-2*x*x+x*x*x , 0f );
-    else if (x< 2f) return max( 4-8*x+5*x*x-x*x*x , 0f );
-    return 0f;
+    if (x<-2.0f) return 0;
+    else if (x<-1.0f) return max( 4.0f+8.0f*x+5.0f*x*x+x*x*x , 0.0f );
+    else if (x< 0.0f) return max( 1.0f-2.0f*x*x-x*x*x , 0.0f );
+    else if (x< 1.0f) return max( 1.0f-2.0f*x*x+x*x*x , 0.0f );
+    else if (x< 2.0f) return max( 4.0f-8.0f*x+5.0f*x*x-x*x*x , 0.0f );
+    return 0.0f;
 }
 
-real max( real x , real y)
-{
-    return ( x > y ) ? x : y ;
-}
 
-QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR )
+QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel )
 {
     real x = P.x();
     real y = P.y();
@@ -118,7 +121,7 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  
             vB += b*tmpV*tmpH;
             return QRgb( vR,  vG,  vB );
             break;
-////////////////\\\\\\\\\\\\\\\\\\\
+// =======================================================
         case HAAR:
             colorTmp = getValue( image, x1 , y1 );
             r = qRed(colorTmp);
@@ -161,7 +164,7 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  
             vB += b*tmpV*tmpH;
             return QRgb( vR,  vG,  vB );
             break;
- ////////////////\\\\\\\\\\\\\\\\\\\
+// =======================================================
         case CUBIC:
             // TODO
             return QRgb( vR,  vG,  vB );
@@ -171,6 +174,28 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  
         }
 }
 
+void transformImage( const QImage& image , QImage& finalImage , const QImage& maskF , qMyLine& lineC )
+{
+    QPolygonF poli( lineC.toVector() );
+    QRectF bBox = poli.boundingRect();
+    uint32 i0, i1 , j0 , j1;
+    i0 = mim( 0 , (uint32)floor( bBox.left() ) ) ;
+    i1 = mim( finalImage.width() , (uint32)floor( bBox.right() ) );
+    j0 = mim( 0 , (uint32)floor( bBox.top() ) ) ;
+    j1 = mim( finalImage.height() , (uint32)floor( bBox.bottom() ) );
+
+    for( uint32 i = i0  ; i < i1 ; i++ )
+    {
+        for( uint32 j = j0 ; j < j1 ; j++ )
+        {
+            if( maskF.pixel( i , j ) )
+            {
+                finalImage.setPixel( i , j , QRgb(128, 255, 90 ) );
+            }
+        }
+    }
+
+}
 
 
 #endif // PIXELMANIPULATION_QT_H

@@ -15,6 +15,8 @@ QImage eBitMapMask( QSize imageSize,  QVector<QPointF> points  )
 
         QPainter painterTMP( &image );
         painterTMP.setBrush( Qt::white );
+        painterTMP.setPen( QPen( QBrush( Qt::white ), 4.0f ) );
+
         painterTMP.drawPolygon(region);
 
         fprintf( stderr , "mask OK!\n");
