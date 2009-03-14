@@ -8,6 +8,7 @@
 #include <QColor>
 
 #include "qimageshow.h"
+#include "pixelManipulation_qt.h"
 
 qImageShow::qImageShow( QWidget *parent) : QWidget(parent)
 {
@@ -176,6 +177,9 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         this->_maskF = eBitMapMask( this->_image.size() , this->_lineC.toVector() );
         this->_showMaskF = true;
         this->_showVectors = true;
+        this->_finalImage = QImage( this->_image.size() , QImage::Format_ARGB32 );
+        this->_finalImage.setAlphaChannel( this->_maskF );
+        transformImage( this->_image , this->_finalImage , this->_maskF , this->_lineC );
         break;
     case Qt::Key_M:
         this->_showMaskF = !this->_showMaskF;
