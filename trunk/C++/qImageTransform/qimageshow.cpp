@@ -179,7 +179,7 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         this->_showVectors = true;
         this->_finalImage = QImage( this->_image.size() , QImage::Format_ARGB32 );
         this->_finalImage.setAlphaChannel( this->_maskF );
-        transformImage( this->_image , this->_finalImage , this->_maskF , this->_lineC );
+        transformImage( this->_image.toImage() , this->_finalImage , this->_maskF , this->_lineC );
         break;
     case Qt::Key_M:
         this->_showMaskF = !this->_showMaskF;
