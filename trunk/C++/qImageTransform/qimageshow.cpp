@@ -126,7 +126,7 @@ void qImageShow::_drawLine( QPainter &painter )
 
 void qImageShow::_drawMasks( QPainter &painter )
 {
-    if(this->_showMaskA) painter.drawImage( 0 , 0  , this->_maskA );
+    if(this->_showMaskA) painter.drawImage( 0 , 0  , this->_finalImage );
     if(this->_showMaskB) painter.drawImage( 0 , 0  , this->_maskB );
     if(this->_showMaskF) painter.drawImage( 0 , 0  , this->_maskF );
 }
@@ -180,6 +180,7 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         this->_finalImage = QImage( this->_image.size() , QImage::Format_ARGB32 );
         this->_finalImage.setAlphaChannel( this->_maskF );
         transformImage( this->_image.toImage() , this->_finalImage , this->_maskF , this->_lineC );
+        this->_showMaskA = true;
         break;
     case Qt::Key_M:
         this->_showMaskF = !this->_showMaskF;

@@ -182,6 +182,8 @@ void transformImage( const QImage& image , QImage& finalImage , const QImage& ma
     j0 = mim( 0 , (uint32)floor( bBox.top() ) ) ;
     j1 = mim( finalImage.height() , (uint32)floor( bBox.bottom() ) );
 
+    fprintf(stderr, "i0 = %d , i1 = %d\n" , (uint32)floor( bBox.left() ) , (uint32)floor( bBox.right() ) );
+
     for( uint32 i = i0  ; i < i1 ; i++ )
     {
         for( uint32 j = j0 ; j < j1 ; j++ )
