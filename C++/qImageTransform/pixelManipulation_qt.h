@@ -15,7 +15,7 @@ real kernelHaar( real x );
 real kernelBilinear( real x );
 real kernelCubic( real x );
 QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR );
-void transformImage( const QImage& image , QImage& finalImage , const QImage& maskF , qMyLine lineC );
+void transformImage( const QImage& image , QImage& finalImage , const QImage& maskF , qMyLine& lineC );
 
 real max( real x , real y){ return ( x > y ) ? x : y ; }
 real mim( real x , real y){ return ( x < y ) ? x : y ; }
@@ -66,9 +66,9 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel )
     real y = P.y();
 
     int x1 = (int)floor(x)   , x2 = (int)ceil(x);
-    int x3 = (int)floor(x)-1 , x4 = (int)ceil(x) + 1 ;
+//    int x3 = (int)floor(x)-1 , x4 = (int)ceil(x) + 1 ;
     int y1 = (int)floor(x)   , y2 = (int)ceil(y);
-    int y3 = (int)floor(x)-1 , y4 = (int)ceil(y) + 1 ;
+//    int y3 = (int)floor(x)-1 , y4 = (int)ceil(y) + 1 ;
 
     int r , g , b ;
     int vR=0 , vG=0 , vB=0;
@@ -119,7 +119,6 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel )
             vR += r*tmpV*tmpH;
             vG += g*tmpV*tmpH;
             vB += b*tmpV*tmpH;
-            return QRgb( vR,  vG,  vB );
             break;
 // =======================================================
         case HAAR:
@@ -162,16 +161,15 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel )
             vR += r*tmpV*tmpH;
             vG += g*tmpV*tmpH;
             vB += b*tmpV*tmpH;
-            return QRgb( vR,  vG,  vB );
             break;
 // =======================================================
         case CUBIC:
             // TODO
-            return QRgb( vR,  vG,  vB );
             break;
         default:
-            return QRgb( vR,  vG,  vB );
+            vR = 0; vG = 0; vB = 0;
         }
+    return qRgb(vR,vG,vB);
 }
 
 void transformImage( const QImage& image , QImage& finalImage , const QImage& maskF , qMyLine& lineC )
@@ -190,7 +188,7 @@ void transformImage( const QImage& image , QImage& finalImage , const QImage& ma
         {
             if( maskF.pixel( i , j ) )
             {
-                finalImage.setPixel( i , j , QRgb(128, 255, 90 ) );
+                finalImage.setPixel( i , j , qRgb(128, 255, 90 ) );
             }
         }
     }
