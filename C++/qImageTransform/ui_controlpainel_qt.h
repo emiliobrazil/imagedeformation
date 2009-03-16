@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'controlpainel_qt.ui'
 **
-** Created: Fri Mar 13 13:05:37 2009
+** Created: Sun Mar 15 23:04:56 2009
 **      by: Qt User Interface Compiler version 4.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -14,7 +14,6 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
-#include <QtGui/QCheckBox>
 #include <QtGui/QGroupBox>
 #include <QtGui/QHeaderView>
 #include <QtGui/QPushButton>
@@ -32,17 +31,11 @@ public:
     QVBoxLayout *verticalLayout_2;
     QPushButton *buttonDrawLineA;
     QPushButton *buttonClearLineA;
-    QPushButton *buttonMaskLineA;
-    QPushButton *buttonFilterLineA;
-    QCheckBox *checkBoxShowMaskA;
     QGroupBox *groupBox_2;
     QWidget *verticalLayoutWidget_3;
     QVBoxLayout *verticalLayout_5;
     QPushButton *buttonDrawLineB;
     QPushButton *buttonClearLineB;
-    QPushButton *buttonMaskLineB;
-    QPushButton *buttonFilterLineB;
-    QCheckBox *checkBoxShowMaskB;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
     QPushButton *buttonOpen;
@@ -54,14 +47,14 @@ public:
     {
         if (ControlPainel_qtClass->objectName().isEmpty())
             ControlPainel_qtClass->setObjectName(QString::fromUtf8("ControlPainel_qtClass"));
-        ControlPainel_qtClass->resize(230, 413);
+        ControlPainel_qtClass->resize(230, 248);
         groupBox = new QGroupBox(ControlPainel_qtClass);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(100, 10, 121, 191));
+        groupBox->setGeometry(QRect(100, 10, 121, 111));
         groupBox->setStyleSheet(QString::fromUtf8("background:rgb(170, 255, 127)"));
         verticalLayoutWidget_2 = new QWidget(groupBox);
         verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
-        verticalLayoutWidget_2->setGeometry(QRect(10, 20, 101, 161));
+        verticalLayoutWidget_2->setGeometry(QRect(10, 20, 101, 81));
         verticalLayout_2 = new QVBoxLayout(verticalLayoutWidget_2);
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setMargin(11);
@@ -78,29 +71,13 @@ public:
 
         verticalLayout_2->addWidget(buttonClearLineA);
 
-        buttonMaskLineA = new QPushButton(verticalLayoutWidget_2);
-        buttonMaskLineA->setObjectName(QString::fromUtf8("buttonMaskLineA"));
-
-        verticalLayout_2->addWidget(buttonMaskLineA);
-
-        buttonFilterLineA = new QPushButton(verticalLayoutWidget_2);
-        buttonFilterLineA->setObjectName(QString::fromUtf8("buttonFilterLineA"));
-        buttonFilterLineA->setAutoRepeat(true);
-
-        verticalLayout_2->addWidget(buttonFilterLineA);
-
-        checkBoxShowMaskA = new QCheckBox(verticalLayoutWidget_2);
-        checkBoxShowMaskA->setObjectName(QString::fromUtf8("checkBoxShowMaskA"));
-
-        verticalLayout_2->addWidget(checkBoxShowMaskA);
-
         groupBox_2 = new QGroupBox(ControlPainel_qtClass);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setGeometry(QRect(100, 210, 121, 191));
+        groupBox_2->setGeometry(QRect(100, 130, 121, 111));
         groupBox_2->setStyleSheet(QString::fromUtf8("background: rgb(255, 170, 127)"));
         verticalLayoutWidget_3 = new QWidget(groupBox_2);
         verticalLayoutWidget_3->setObjectName(QString::fromUtf8("verticalLayoutWidget_3"));
-        verticalLayoutWidget_3->setGeometry(QRect(10, 20, 101, 161));
+        verticalLayoutWidget_3->setGeometry(QRect(10, 20, 101, 81));
         verticalLayout_5 = new QVBoxLayout(verticalLayoutWidget_3);
         verticalLayout_5->setSpacing(6);
         verticalLayout_5->setMargin(11);
@@ -117,25 +94,9 @@ public:
 
         verticalLayout_5->addWidget(buttonClearLineB);
 
-        buttonMaskLineB = new QPushButton(verticalLayoutWidget_3);
-        buttonMaskLineB->setObjectName(QString::fromUtf8("buttonMaskLineB"));
-
-        verticalLayout_5->addWidget(buttonMaskLineB);
-
-        buttonFilterLineB = new QPushButton(verticalLayoutWidget_3);
-        buttonFilterLineB->setObjectName(QString::fromUtf8("buttonFilterLineB"));
-        buttonFilterLineB->setAutoRepeat(true);
-
-        verticalLayout_5->addWidget(buttonFilterLineB);
-
-        checkBoxShowMaskB = new QCheckBox(verticalLayoutWidget_3);
-        checkBoxShowMaskB->setObjectName(QString::fromUtf8("checkBoxShowMaskB"));
-
-        verticalLayout_5->addWidget(checkBoxShowMaskB);
-
         verticalLayoutWidget = new QWidget(ControlPainel_qtClass);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(6, 10, 87, 391));
+        verticalLayoutWidget->setGeometry(QRect(6, 10, 87, 231));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setMargin(11);
@@ -172,15 +133,9 @@ public:
         groupBox->setTitle(QApplication::translate("ControlPainel_qtClass", "Line A", 0, QApplication::UnicodeUTF8));
         buttonDrawLineA->setText(QApplication::translate("ControlPainel_qtClass", "Draw", 0, QApplication::UnicodeUTF8));
         buttonClearLineA->setText(QApplication::translate("ControlPainel_qtClass", "Clear", 0, QApplication::UnicodeUTF8));
-        buttonMaskLineA->setText(QApplication::translate("ControlPainel_qtClass", "Mask", 0, QApplication::UnicodeUTF8));
-        buttonFilterLineA->setText(QApplication::translate("ControlPainel_qtClass", "Filter", 0, QApplication::UnicodeUTF8));
-        checkBoxShowMaskA->setText(QApplication::translate("ControlPainel_qtClass", "Show Mask", 0, QApplication::UnicodeUTF8));
         groupBox_2->setTitle(QApplication::translate("ControlPainel_qtClass", "Line B", 0, QApplication::UnicodeUTF8));
         buttonDrawLineB->setText(QApplication::translate("ControlPainel_qtClass", "Draw", 0, QApplication::UnicodeUTF8));
         buttonClearLineB->setText(QApplication::translate("ControlPainel_qtClass", "Clear", 0, QApplication::UnicodeUTF8));
-        buttonMaskLineB->setText(QApplication::translate("ControlPainel_qtClass", "Mask", 0, QApplication::UnicodeUTF8));
-        buttonFilterLineB->setText(QApplication::translate("ControlPainel_qtClass", "Filter", 0, QApplication::UnicodeUTF8));
-        checkBoxShowMaskB->setText(QApplication::translate("ControlPainel_qtClass", "Show Mask", 0, QApplication::UnicodeUTF8));
         buttonOpen->setText(QApplication::translate("ControlPainel_qtClass", "Open", 0, QApplication::UnicodeUTF8));
         buttonSave->setText(QApplication::translate("ControlPainel_qtClass", "Save", 0, QApplication::UnicodeUTF8));
         buttonQuit->setText(QApplication::translate("ControlPainel_qtClass", "Quit", 0, QApplication::UnicodeUTF8));
