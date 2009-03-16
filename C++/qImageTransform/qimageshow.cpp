@@ -16,6 +16,9 @@ qImageShow::qImageShow( QWidget *parent) : QWidget(parent)
         this->_drawinglineB = false;
         this->setCursor(Qt::CrossCursor);
         this->_showVectors = false;
+        this->_showSetVectors = false;
+        this->_size = QSize( 800 , 800 );
+
 }
 
 qImageShow::~qImageShow()
@@ -26,6 +29,8 @@ qImageShow::~qImageShow()
 void qImageShow::drawImage( const QImage& image )
 {
         this->_image = QPixmap::fromImage( image ) ;
+        this->_size = this->_image.size();
+        this->resize( this->_image.size());
 	update();
 }
 
@@ -46,17 +51,19 @@ void qImageShow::mousePressEvent( QMouseEvent *event )
 
 void qImageShow::mouseMoveEvent( QMouseEvent *event )
 {
-	if( _drawinglineA && ( event->buttons() == Qt::LeftButton ))
-	{
-		_lastPoint = event->pos();
-                _lineA.insertPoint( _lastPoint );
-	}
-	else if( _drawinglineB && ( event->buttons() == Qt::LeftButton ))
-	{
-		_lastPoint = event->pos();
-                _lineB.insertPoint( _lastPoint );
-	}
-	update();
+    if( _drawinglineA && ( event->buttons() == Qt::LeftButton ))
+    {
+        this->_showLineA = true ;
+        this->_lastPoint = event->pos();
+        this->_lineA.insertPoint( _lastPoint );
+    }
+    else if( _drawinglineB && ( event->buttons() == Qt::LeftButton ))
+    {
+        this->_showLineA = true ;
+        this->_lastPoint = event->pos();
+        this->_lineB.insertPoint( _lastPoint );
+    }
+    update();
 }
 
 void qImageShow::paintEvent( QPaintEvent *event )
@@ -65,14 +72,16 @@ void qImageShow::paintEvent( QPaintEvent *event )
 	painter.setBrush(Qt::black);
 	painter.drawRect(QRect( 0 , 0 , 800 , 800) );
         painter.drawPixmap( 0 , 0 , this->_image);
-        _drawMasks( painter );
-        _drawLine( painter );
+        this-> _drawMasks( painter );
+        this->_drawLine( painter );
+        this->_drawVectorField( painter );
 }
 
 void qImageShow::_drawLine( QPainter &painter )
 {
     painter.setPen( QPen( QBrush( Qt::green ), 4.0f ) );
-    if (_lineA.points()!=NULL && _lineA.pointCount()>0) {
+    if (this->_lineA.points()!=NULL && this->_lineA.pointCount()>0 && this->_showLineA)
+    {
         painter.drawPolyline( _lineA.points() , _lineA.pointCount());
         painter.setPen( QPen( QBrush( Qt::darkGreen ), 6.0f ) );
         for ( uint32 i=0 ; i < _lineA.pointCount() ; ++i )
@@ -81,7 +90,8 @@ void qImageShow::_drawLine( QPainter &painter )
         }
     }
     painter.setPen( QPen( QBrush( Qt::red ), 4.0f ) );
-    if (_lineB.points()!=NULL && _lineB.pointCount()>0) {
+    if (this->_lineB.points()!=NULL && this->_lineB.pointCount()>0 && this->_showLineB )
+    {
         painter.drawPolyline( _lineB.points() , _lineB.pointCount());
         painter.setPen( QPen( QBrush( Qt::darkRed ), 6.0f ) );
 
@@ -90,31 +100,6 @@ void qImageShow::_drawLine( QPainter &painter )
             painter.drawPoint( _lineB.points()[i] );
         }
     }
-
-//    painter.setPen( QPen( QBrush( Qt::white ), 2.0f ) );
-//    if (_lineC.points()!=NULL && _lineC.pointCount()>0) {
-//        painter.drawPolyline( _lineC.points() , _lineC.pointCount());
-//    }
-//    painter.setPen( QPen( QBrush( Qt::cyan ), 2.0f ) );
-//    if (_lineD.points()!=NULL && _lineD.pointCount()>0) {
-//        painter.drawPolyline( _lineD.points() , _lineD.pointCount());
-//        painter.setPen( QPen( QBrush( Qt::darkCyan ), 4.0f ) );
-//
-//        for ( uint32 i=0 ; i < _lineB.pointCount() ; ++i )
-//        {
-//            painter.drawPoint( _lineD.points()[i] );
-//        }
-//    }
-//
-//    painter.setPen( QPen( QBrush( Qt::green ), 1.0f ) );
-//    if ( this->_showVectors ) {
-//        painter.drawPolyline( _lineD.points() , _lineD.pointCount());
-//        for ( uint32 i=0 ; i < _lineB.pointCount() ; ++i )
-//        {
-//            painter.drawLine( this->_lineB.at(i) , _lineD.at(i)  );
-//        }
-//    }
-
 }
 
 
@@ -125,7 +110,7 @@ void qImageShow::_drawMasks( QPainter &painter )
     if(this->_showMaskF) painter.drawImage( 0 , 0  , this->_maskF );
 }
 
-void qImageShow::builField()
+void qImageShow::_setField()
 {
     uint32 numberOfA = this->_lineA.pointCount() ;
     uint32 numberOfB = this->_lineB.pointCount() ;
@@ -155,9 +140,66 @@ void qImageShow::builField()
     delete[] points;
 }
 
+
+void qImageShow::_buildField( void )
+{
+    QPolygonF poli( this->_lineC.toVector() );
+    QRectF bBox = poli.boundingRect();
+    uint32 i0, i1 , j0 , j1;
+    i0 = maximum( 0 , (uint32)floor( bBox.left() ) ) ;
+    i1 = minimum( this->_finalImage.width() , (uint32)floor( bBox.right() ) );
+    j0 = maximum( 0 , (uint32)floor( bBox.top() ) ) ;
+    j1 = minimum( this->_finalImage.height() , (uint32)floor( bBox.bottom() ) );
+
+    this->_vectorField = std::vector< std::pair<Vector2D,Vector2D > >();
+
+    for( uint32 i = i0  ; i < i1 ; i++ )
+    {
+        for( uint32 j = j0 ; j < j1 ; j++ )
+        {
+            if( qGray( this->_maskF.pixel( i , j ) ) > 0  )
+            {
+                Vector2D p( (float)i , (float)j );
+                Vector2D v = evalField( (float)i , (float)j , this->_field );
+                this->_vectorField.push_back( std::pair<Vector2D,Vector2D> ( p , v ) );
+            }
+        }
+    }
+}
+
+void qImageShow::_drawVectorField( QPainter &painter )
+{
+    if ( this->_showVectors )
+    {
+        uint32 step = 32;
+        painter.setPen( QPen( QBrush( Qt::yellow ), 1.0f ) );
+        uint32 numberOfVectors = this->_vectorField.size();
+        for ( uint32 i=0 ; i < numberOfVectors ; i = i + step )
+        {
+            float x = this->_vectorField[i].first.x();
+            float y = this->_vectorField[i].first.y();
+
+            float u = this->_vectorField[i].second.x();
+            float v = this->_vectorField[i].second.y();
+
+            painter.drawLine( QPointF( x , y ) , QPointF( x + u , y + v ) );
+        }
+    }
+
+    if ( this->_showSetVectors)
+    {
+        painter.setPen( QPen( QBrush( Qt::green ), 1.0f ) );
+        for ( uint32 i=0 ; i < _lineB.pointCount() ; ++i )
+        {
+            painter.drawLine( this->_lineB.at(i) , _lineD.at(i)  );
+        }
+    }
+}
+
+
 void qImageShow::keyPressEvent ( QKeyEvent * event )
 {
-            std::pair< uint32,QPointF > pairTeste ;
+    std::pair< uint32,QPointF > pairTeste ;
     switch ( event->key() )
     {
     case Qt::Key_Q:
@@ -177,16 +219,35 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         this->_maskF = eBitMapMask( this->_image.size() , this->_lineC.toVector() );
         this->_showMaskF = false;
         this->_showImageFinal = true;
-        this->_finalImage = QImage( this->_image.size() , QImage::Format_ARGB32 );
+        this->_finalImage = QImage( this->_size , QImage::Format_ARGB32 );
         this->_finalImage.setAlphaChannel( this->_maskF );
-        this->builField();
-        transformImage( this->_image.toImage() , this->_finalImage , this->_maskF , this->_lineC , this->_field );
+        this->_setField();
+        this->_buildField();
+        transformImage( this->_image.toImage() , this->_finalImage , this->_vectorField );
         break;
     case Qt::Key_M:
         this->_showMaskF = !this->_showMaskF;
         break;
     case Qt::Key_F:
         this->_showImageFinal = !this->_showImageFinal;
+        break;
+    case Qt::Key_V:
+        this->_showVectors = !this->_showVectors;
+        break;
+    case Qt::Key_S:
+        this->_showSetVectors = !this->_showSetVectors;
+        break;
+    case Qt::Key_A:
+        this->_showLineA = !this->_showLineA;
+        break;
+    case Qt::Key_B:
+        this->_showLineB = !this->_showLineB;
+        break;
+    case Qt::Key_1:
+        this->drawLineA() ;
+        break;
+    case Qt::Key_2:
+        this->drawLineB() ;
         break;
     default:
         QWidget::keyPressEvent ( event );

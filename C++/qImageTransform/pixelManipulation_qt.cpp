@@ -177,27 +177,19 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel )
     return color;
 }
 
-void transformImage( const QImage& image , QImage& finalImage , const QImage& maskF , qMyLine& lineC , vector_field& field )
+void transformImage( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField )
 {
-    QPolygonF poli( lineC.toVector() );
-    QRectF bBox = poli.boundingRect();
-    uint32 i0, i1 , j0 , j1;
-    i0 = maximum( 0 , (uint32)floor( bBox.left() ) ) ;
-    i1 = minimum( finalImage.width() , (uint32)floor( bBox.right() ) );
-    j0 = maximum( 0 , (uint32)floor( bBox.top() ) ) ;
-    j1 = minimum( finalImage.height() , (uint32)floor( bBox.bottom() ) );
-
-    for( uint32 i = i0  ; i < i1 ; i++ )
+    uint32 numberOfVectors = vectorField.size();
+    for ( uint32 i=0 ; i < numberOfVectors ;++i)
     {
-        for( uint32 j = j0 ; j < j1 ; j++ )
-        {
-            if( qGray( maskF.pixel( i , j ) ) > 0  )
-            {
-                Vector2D v = evalField( (float)i , (float)j , field );
-                QRgb color = pixelValue( image , QPointF( (float)i + v.x()  , (float)j + v.y() ) );
-                finalImage.setPixel( i , j , color ) ;
-            }
-        }
+        real x = vectorField[i].first.x();
+        real y = vectorField[i].first.y();
+
+        real u = vectorField[i].second.x();
+        real v = vectorField[i].second.y();
+
+        QRgb color = pixelValue( image , QPointF( x + u  , y + v ) );
+        finalImage.setPixel( (uint32)x , (uint32)y , color ) ;
     }
 }
 

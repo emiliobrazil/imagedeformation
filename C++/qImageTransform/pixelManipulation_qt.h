@@ -5,6 +5,8 @@
 
 #include <primitive_types.h>
 #include <Vector2D.h>
+#include "qMyLine.h"
+
 #include <mlsvf.hpp>
 
 #include <QPainter>
@@ -12,10 +14,10 @@
 #include <QVector>
 #include <QPolygonF>
 
-#include "qMyLine.h"
+#include <vector>
 
 typedef Wendland31<real,2> kernel;
-typedef LinearMLSVF<real,2,kernel> vector_field;
+typedef DivLinearMLSVF<real,2,kernel> vector_field;
 
 
 enum interpolationKernel{ HAAR, BILINEAR, CUBIC };
@@ -25,9 +27,9 @@ real kernelHaar( real x );
 real kernelBilinear( real x );
 real kernelCubic( real x );
 QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR );
-void transformImage( const QImage& image , QImage& finalImage , const QImage& maskF , qMyLine& lineC , vector_field& field );
+void transformImage( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField );
 
-QImage eBitMapMask( QSize imageSize,  QVector<QPointF> points  );
+QImage eBitMapMask( QSize imageSize ,  QVector<QPointF> points  );
 
 real maximum( real x , real y);
 real minimum( real x , real y);

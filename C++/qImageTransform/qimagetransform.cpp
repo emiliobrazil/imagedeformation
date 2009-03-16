@@ -17,6 +17,17 @@ qImageTransform::qImageTransform(QWidget *parent) : QMainWindow(parent)
     this->_imageWindow = new qImageShow();
     this->_imageWindow->show();
 
+    QImage image("image_test/zebra.jpg");
+    if (image.isNull())
+    {
+        QMessageBox::information(this, tr("Image Viewer"),
+                                 tr("Cannot load %1.").arg("image_test/zebra.jpg"));
+        return;
+    }
+    this->_image = image;
+    drawImage( );
+
+
     setFixedSize(buttons->frameSize());
     setWindowTitle(tr("Tools"));
 }
