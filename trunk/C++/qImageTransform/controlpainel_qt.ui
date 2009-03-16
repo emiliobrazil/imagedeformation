@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>230</width>
-    <height>413</height>
+    <height>248</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>100</x>
      <y>10</y>
      <width>121</width>
-     <height>191</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -34,7 +34,7 @@
       <x>10</x>
       <y>20</y>
       <width>101</width>
-      <height>161</height>
+      <height>81</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -55,30 +55,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="buttonMaskLineA">
-       <property name="text">
-        <string>Mask</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="buttonFilterLineA">
-       <property name="text">
-        <string>Filter</string>
-       </property>
-       <property name="autoRepeat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBoxShowMaskA">
-       <property name="text">
-        <string>Show Mask</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -86,9 +62,9 @@
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>210</y>
+     <y>130</y>
      <width>121</width>
-     <height>191</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -103,7 +79,7 @@
       <x>10</x>
       <y>20</y>
       <width>101</width>
-      <height>161</height>
+      <height>81</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -124,30 +100,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="buttonMaskLineB">
-       <property name="text">
-        <string>Mask</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="buttonFilterLineB">
-       <property name="text">
-        <string>Filter</string>
-       </property>
-       <property name="autoRepeat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBoxShowMaskB">
-       <property name="text">
-        <string>Show Mask</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -157,7 +109,7 @@
      <x>6</x>
      <y>10</y>
      <width>87</width>
-     <height>391</height>
+     <height>231</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">

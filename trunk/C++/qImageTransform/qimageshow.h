@@ -2,8 +2,8 @@
 #define QIMAGESHOW_H
 
 #include <QtGui/QWidget>
+#include "pixelManipulation_qt.h"
 #include "qMyLine.h"
-#include "maskImage_qt.h"
 
 class qImageShow : public QWidget
 {
@@ -19,16 +19,6 @@ public:
     void drawLineB( void ){this->_drawinglineA = false ; this->_drawinglineB = true ; update();}
     void clearLineA( void ){this->_lineA.clear(); update();}
     void clearLineB( void ){this->_lineB.clear(); update();}
-    void filterLineA( void ){this->_lineA.lineFilter(); update();}
-    void filterLineB( void ){this->_lineB.lineFilter(); update();}
-    void buidMaskA( void ) { this->_maskA = eBitMapMask( this->_image.size() , this->_lineA.toVector() );  update(); }
-    void buidMaskB( void ) { this->_maskB = eBitMapMask( this->_image.size() , this->_lineB.toVector() );  update(); }
-    void changeShowMaskA( bool state ){ this->_showMaskA = state ;  update();}
-    void changeShowMaskB( bool state ){ this->_showMaskB = state ;  update();}
-    void changeShowMaskA( void ){ this->_showMaskA = !(this->_showMaskA);  update();}
-    void changeShowMaskB( void ){ this->_showMaskB = !(this->_showMaskB);  update();}
-    bool getShowMaskA( void ){ return this->_showMaskA ; }
-    bool getShowMaskB( void ){ return this->_showMaskB ; }
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -42,6 +32,8 @@ protected:
 
     void _drawMasks( QPainter &painter );
 
+    void builField( void );
+
 private:
     QPixmap _image;
 
@@ -53,22 +45,17 @@ private:
 
     bool _drawinglineA;
     bool _drawinglineB;
-    bool _showMaskA;
-    bool _showMaskB;
+
     bool _showMaskF;
+    bool _showImageFinal;
 
     bool _showVectors;
-
-    QImage _maskA;
-    QImage _maskB;
 
     QImage _maskF;
 
     QImage _finalImage;
 
-    QPointF _pointTesteA;
-    QPointF _pointTesteB;
-
+    vector_field _field;
 };
 
 #endif // QIMAGESHOW_H

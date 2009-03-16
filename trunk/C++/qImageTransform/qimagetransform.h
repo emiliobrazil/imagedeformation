@@ -20,12 +20,6 @@ public slots:
         void drawLineB( void ){ this->_imageWindow->drawLineB(); }
         void clearLineA( void ){ this->_imageWindow->clearLineA(); }
         void clearLineB( void ){ this->_imageWindow->clearLineB(); }
-        void filterLineA( void ){ this->_imageWindow->filterLineA(); }
-        void filterLineB( void ){ this->_imageWindow->filterLineB(); }
-        void buildMaskA( void ) { this->_imageWindow->buidMaskA();}
-        void buildMaskB( void ){ this->_imageWindow->buidMaskB();}
-        void stateShowMaskA( int state ) { this->_imageWindow->changeShowMaskA( state==2 ); }
-        void stateShowMaskB( int state ) { this->_imageWindow->changeShowMaskB( state==2 ); }
 
 private slots:
 	void drawImage( void );

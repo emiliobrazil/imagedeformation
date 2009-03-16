@@ -18,27 +18,14 @@ signals:
 	void sDrawLineA( void );
 	void sDrawLineB( void );
 	void sClearLineA( void );
-	void sClearLineB( void );
-	void sFilterLineA( void ) ;
-	void sFilterLineB( void) ;
-        void sMaskA( void );
-        void sMaskB( void );
-        void sStateShowMaskA( int state ) ;
-        void sStateShowMaskB( int state ) ;
+        void sClearLineB( void );
 
 private slots:
 	void open( void );
 	void drawLineA( void ) { emit sDrawLineA(); }
 	void drawLineB( void ) { emit sDrawLineB(); }
 	void clearLineA( void ) { emit sClearLineA() ; }
-	void clearLineB( void ) { emit sClearLineB() ; }
-	void filterLineA( void ) { emit sFilterLineA() ; }
-        void filterLineB( void ) {emit sFilterLineB() ; }
-        void maskA( void ) { emit sMaskA() ;}
-        void maskB( void ) { emit sMaskB() ;}
-        void stateShowMaskA(int state ) { emit sStateShowMaskA( state ) ;}
-        void stateShowMaskB( int state ) { emit sStateShowMaskB( state ) ;}
-
+        void clearLineB( void ) { emit sClearLineB() ; }
 private:
     Ui::ControlPainel_qtClass ui;
 };

@@ -222,7 +222,7 @@ void qMyLine::superSample( real step )
     }
     *this = tmpLine;
     tmpLine.clear();
-    std::cerr << "number of Points = " << this->_pointCount << std::endl;
+//    std::cerr << "number of Points = " << this->_pointCount << std::endl;
 }
 
 void qMyLine::lineFilter( real step )

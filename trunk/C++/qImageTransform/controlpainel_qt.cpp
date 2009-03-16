@@ -12,13 +12,7 @@ ControlPainel_qt::ControlPainel_qt(QWidget *parent)
 	connect( ui.buttonDrawLineA, SIGNAL( clicked() ), this, SLOT( drawLineA() ) );
 	connect( ui.buttonDrawLineB, SIGNAL( clicked() ), this, SLOT( drawLineB() ) );
 	connect( ui.buttonClearLineA, SIGNAL( clicked() ), this, SLOT( clearLineA() ) );
-	connect( ui.buttonClearLineB, SIGNAL( clicked() ), this, SLOT( clearLineB() ) );
-	connect( ui.buttonFilterLineA, SIGNAL( clicked() ), this, SLOT( filterLineA() ) );
-        connect( ui.buttonFilterLineB, SIGNAL( clicked() ), this, SLOT( filterLineB() ) );
-        connect( ui.buttonMaskLineA, SIGNAL( clicked() ), this, SLOT( maskA() ) );
-        connect( ui.buttonMaskLineB, SIGNAL( clicked() ), this, SLOT( maskB() ) );
-        connect( ui.checkBoxShowMaskA, SIGNAL( stateChanged( int ) ), this, SLOT( stateShowMaskA( int ) ) );
-        connect( ui.checkBoxShowMaskB, SIGNAL( stateChanged( int ) ), this, SLOT( stateShowMaskB( int ) ) );
+        connect( ui.buttonClearLineB, SIGNAL( clicked() ), this, SLOT( clearLineB() ) );
 }
 
 ControlPainel_qt::~ControlPainel_qt()
