@@ -2,6 +2,7 @@
 #define QIMAGESHOW_H
 
 #include <QtGui/QWidget>
+#include <vector>
 #include "pixelManipulation_qt.h"
 #include "qMyLine.h"
 
@@ -15,8 +16,8 @@ public:
 
     void drawImage(const QImage& image);
 
-    void drawLineA( void ){this->_drawinglineA = true ; this->_drawinglineB = false ; update();}
-    void drawLineB( void ){this->_drawinglineA = false ; this->_drawinglineB = true ; update();}
+    void drawLineA( void ){this->_drawinglineA = true  ; this->_showLineA = true ; this->_drawinglineB = false ; update();}
+    void drawLineB( void ){this->_drawinglineA = false ; this->_showLineB = true ; this->_drawinglineB = true  ; update();}
     void clearLineA( void ){this->_lineA.clear(); update();}
     void clearLineB( void ){this->_lineB.clear(); update();}
 
@@ -32,7 +33,9 @@ protected:
 
     void _drawMasks( QPainter &painter );
 
-    void builField( void );
+    void _drawVectorField( QPainter &painter );
+    void _setField( void );
+    void _buildField( void );
 
 private:
     QPixmap _image;
@@ -45,11 +48,18 @@ private:
 
     bool _drawinglineA;
     bool _drawinglineB;
+    bool _showLineA;
+    bool _showLineB;
 
     bool _showMaskF;
     bool _showImageFinal;
 
+    bool _showSetVectors;
     bool _showVectors;
+
+    std::vector< std::pair<Vector2D,Vector2D> > _vectorField;
+
+    QSize _size;
 
     QImage _maskF;
 
