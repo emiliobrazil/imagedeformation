@@ -10,6 +10,8 @@
 #include "qimageshow.h"
 #include "pixelManipulation_qt.h"
 
+#include <Vector2D.h>
+
 qImageShow::qImageShow( QWidget *parent) : QWidget(parent)
 {
         this->_drawinglineA = false;
@@ -69,8 +71,7 @@ void qImageShow::mouseMoveEvent( QMouseEvent *event )
 void qImageShow::paintEvent( QPaintEvent *event )
 {
 	QPainter painter(this);
-	painter.setBrush(Qt::black);
-	painter.drawRect(QRect( 0 , 0 , 800 , 800) );
+
         painter.drawPixmap( 0 , 0 , this->_image);
         this-> _drawMasks( painter );
         this->_drawLine( painter );
@@ -114,25 +115,92 @@ void qImageShow::_setField()
 {
     uint32 numberOfA = this->_lineA.pointCount() ;
     uint32 numberOfB = this->_lineB.pointCount() ;
-    uint32 numberOfsamples = numberOfA + numberOfB - 2 ;
+
+    this->_vectorSamples = std::vector< std::pair<Vector2D,Vector2D > >();
+
+//    for ( uint32 i = 0 ; i < numberOfA ; ++i)
+//    {
+//        Vector2D p(this->_lineA.at(i).x(), this->_lineA.at(i).y());
+//        Vector2D v( 0 , 0 );
+//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p , v ) );
+//    }
+
+    real radiusTMP = 0 ;
+
+    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+    {
+        Vector2D p( this->_lineB.at(i).x(),this->_lineB.at(i).y() );
+        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p , v ) );
+        real N = v.norm();
+        radiusTMP = ( N > radiusTMP )? N : radiusTMP ;
+    }
+
+    real alpha, beta ;
+
+    alpha =1.0f; beta = .25f;
+    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+    {
+        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+    }
+
+    alpha = 1.0f; beta = .50f;
+    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+    {
+        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+    }
+
+    alpha = 0.75f; beta = .75f;
+    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+    {
+        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+    }
+
+    alpha = 0.75f; beta = 1.0f;
+    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+    {
+        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+    }
+
+    alpha = 0.5f; beta = 1.5f;
+    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+    {
+        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+    }
+
+
+    alpha = 0.0f; beta = 2.5f;
+    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+    {
+        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+    }
+
+    this->_MLSRadius = 2.0f*radiusTMP;
+
+    uint32 numberOfsamples = this->_vectorSamples.size() ;
+
     real* points = new real[ 2 * numberOfsamples ];
     real* vectors = new real[ 2 * numberOfsamples ];
 
-    this->_field.setRadius( 80.0f );
 
-    for (register unsigned int i = 0; i < numberOfA ; ++i)
+    for( uint32 i = 0 ; i < numberOfsamples ; ++i )
     {
-        points[2*i  ] = this->_lineA.at(i).x();
-        points[2*i+1] = this->_lineA.at(i).y();
-        vectors[2*i  ] = 0.0f;
-        vectors[2*i+1] = 0.0f;
-    }
-    for (register unsigned int i = 1 ; i < ( numberOfB - 1 ) ; ++i)
-    {
-        points[2*i  ] = this->_lineB.at(i).x();
-        points[2*i+1] = this->_lineB.at(i).y();
-        vectors[2*i  ] = this->_lineD.at(i).x() - this->_lineB.at(i).x();
-        vectors[2*i+1] = this->_lineD.at(i).y() - this->_lineB.at(i).y();
+        points[  2*i   ] = this->_vectorSamples[i].first.x();
+        points[  2*i+1 ] = this->_vectorSamples[i].first.y();
+        vectors[ 2*i   ] = this->_vectorSamples[i].second.x();
+        vectors[ 2*i+1 ] = this->_vectorSamples[i].second.y();
     }
 
     this->_field.setSamples( numberOfsamples , points , vectors );
@@ -143,6 +211,9 @@ void qImageShow::_setField()
 
 void qImageShow::_buildField( void )
 {
+
+    this->_field.setRadius( this->_MLSRadius );
+
     QPolygonF poli( this->_lineC.toVector() );
     QRectF bBox = poli.boundingRect();
     uint32 i0, i1 , j0 , j1;
@@ -169,9 +240,9 @@ void qImageShow::_buildField( void )
 
 void qImageShow::_drawVectorField( QPainter &painter )
 {
+    uint32 step = 32;
     if ( this->_showVectors )
     {
-        uint32 step = 32;
         painter.setPen( QPen( QBrush( Qt::yellow ), 1.0f ) );
         uint32 numberOfVectors = this->_vectorField.size();
         for ( uint32 i=0 ; i < numberOfVectors ; i = i + step )
@@ -188,10 +259,18 @@ void qImageShow::_drawVectorField( QPainter &painter )
 
     if ( this->_showSetVectors)
     {
+        step = 1;
         painter.setPen( QPen( QBrush( Qt::green ), 1.0f ) );
-        for ( uint32 i=0 ; i < _lineB.pointCount() ; ++i )
+        uint32 numberOfSamples = this->_vectorSamples.size();
+        for ( uint32 i=0 ; i < numberOfSamples ; i = i + step )
         {
-            painter.drawLine( this->_lineB.at(i) , _lineD.at(i)  );
+            float x = this->_vectorSamples[i].first.x();
+            float y = this->_vectorSamples[i].first.y();
+
+            float u = this->_vectorSamples[i].second.x();
+            float v = this->_vectorSamples[i].second.y();
+
+            painter.drawLine( QPointF( x , y ) , QPointF( x + u , y + v ) );
         }
     }
 }
@@ -248,6 +327,10 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         break;
     case Qt::Key_2:
         this->drawLineB() ;
+        break;
+    case Qt::Key_C:
+        this->clearLineA();
+        this->clearLineB();
         break;
     default:
         QWidget::keyPressEvent ( event );

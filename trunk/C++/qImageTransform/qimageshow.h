@@ -57,7 +57,11 @@ private:
     bool _showSetVectors;
     bool _showVectors;
 
+
+    real _MLSRadius;
+
     std::vector< std::pair<Vector2D,Vector2D> > _vectorField;
+    std::vector< std::pair<Vector2D,Vector2D> > _vectorSamples;
 
     QSize _size;
 
