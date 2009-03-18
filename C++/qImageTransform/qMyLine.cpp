@@ -99,7 +99,6 @@ void qMyLine::insertPoint( QPointF p , uint32 d )
 
 void qMyLine::chaikinFilter( uint16 nOfsimplify )
 {
-        std::cerr << "number of Points = " << this->_pointCount << std::endl;
 
     for( uint16 n = 0 ; n < nOfsimplify ; ++n )
     {
@@ -141,7 +140,6 @@ void qMyLine::chaikinFilter( uint16 nOfsimplify )
         _points = tmp ;
         _pointCount = sizeTmp;
     }
-//    std::cerr << "number of Points = " << this->_pointCount << std::endl;
 }
 
 void qMyLine::chaikinSubDivide( uint16 nOfsimplify )
@@ -190,7 +188,6 @@ void qMyLine::chaikinSubDivide( uint16 nOfsimplify )
         _points = tmp ;
         _pointCount = sizeTmp;
     }
-//    std::cerr << "number of Points = " << this->_pointCount << std::endl;
 }
 
 void qMyLine::superSample( real step )
@@ -222,7 +219,6 @@ void qMyLine::superSample( real step )
     }
     *this = tmpLine;
     tmpLine.clear();
-//    std::cerr << "number of Points = " << this->_pointCount << std::endl;
 }
 
 void qMyLine::lineFilter( real step )
@@ -325,8 +321,8 @@ qMyLine& qMyLine::join( const qMyLine& line ) const
 
     if( end == 0 ) return *lineTmp;
 
-    while(   this->at( (this->pointCount())-1 ) == line.at( start ) ) { ++start; fprintf(stderr,"estou aqui --1\n");}
-    while( ( this->at( 0 ) == line.at( end-1) ) && ( end > 0 ) ) {--end; fprintf(stderr,"estou aqui --2\n"); }
+    while(   this->at( (this->pointCount())-1 ) == line.at( start ) ) ++start;
+    while( ( this->at( 0 ) == line.at( end-1) ) && ( end > 0 ) ) --end;
 
     if( end < start ) return *lineTmp;
 
@@ -420,13 +416,10 @@ uint32 qMyLine::argMaxSizeSeg( void )
 
 void qMyLine::reparametri( const  qMyLine& line )
 {
-        fprintf(stderr, "this = %d  ---  line = %d\n", this->_pointCount , line.pointCount() );
-
     while( this->_pointCount > line.pointCount() )
         this->chaikinFilter( 1 );
     while( this->_pointCount < ( ( line.pointCount()*.5 ) - 2 ))
         this->chaikinSubDivide( 1 );
     uint32 count = line.pointCount() - this->pointCount();
     this->grow( count );
-    fprintf(stderr, "this = %d  ---  line = %d\n", this->_pointCount , line.pointCount() );
 }
