@@ -118,12 +118,12 @@ void qImageShow::_setField()
 
     this->_vectorSamples = std::vector< std::pair<Vector2D,Vector2D > >();
 
-//    for ( uint32 i = 0 ; i < numberOfA ; ++i)
-//    {
-//        Vector2D p(this->_lineA.at(i).x(), this->_lineA.at(i).y());
-//        Vector2D v( 0 , 0 );
-//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p , v ) );
-//    }
+    for ( uint32 i = 0 ; i < numberOfA ; ++i)
+    {
+        Vector2D p(this->_lineA.at(i).x(), this->_lineA.at(i).y());
+        Vector2D v( 0 , 0 );
+        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p , v ) );
+    }
 
     real radiusTMP = 0 ;
 
