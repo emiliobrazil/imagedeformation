@@ -6,6 +6,8 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #include "qMyLine.h"
 #include <primitive_types.h>
@@ -97,9 +99,52 @@ void qMyLine::insertPoint( QPointF p , uint32 d )
     }
 }
 
+
+void qMyLine::save( QString filename )
+{
+     if (!fileName.isEmpty())
+    {
+         std::ifstream outFile;
+         outFile.open ( filename , std::ifstream::app);
+         outFile << "N" << std::endl ;
+         outFile << this->_pointCount << std::endl;
+         for (uint32 i = 0 ; i < this->_pointCount ; ++i )
+         {
+            outFile << this->_points[i].x() << " " << this->_points[i].y() << std::endl;
+         }
+         outFile << "N" << std::endl ;
+     }
+}
+
+void qMyLine::load( QString filename , uint32 curve )
+{
+     if (!fileName.isEmpty())
+    {
+         std::ifstream inFile;
+         inFile.open ( filename , std::ifstream::in);
+         uint32 count = 0 ;
+         while( count < curve )
+         {
+             std::string tmp;
+             inFile >> &tmp ;
+             if( tmp.compare("N") == 0 ) ++count;
+             if( tmp.compare("\eof") == 0 ) return;
+         }
+
+         uint32 numberOfPoints;
+         inFile >> &numberOfPoints;
+         for(uint32 i = 0 ; i < numberOfPoints ; ++i )
+         {
+             float x , y;
+             inFile >> &x >> &y;
+             QPointF p( x , y);
+             this->insertPoint(p);
+         }
+     }
+}
+
 void qMyLine::chaikinFilter( uint16 nOfsimplify )
 {
-
     for( uint16 n = 0 ; n < nOfsimplify ; ++n )
     {
         // make sure we do not loose any points!!
