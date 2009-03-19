@@ -10,6 +10,8 @@
 
 #include <QPoint>
 #include <QVector>
+#include <QString>
+
 #include <Vector2D.h>
 #include "primitive_types.h"
 
@@ -68,6 +70,8 @@ public:
 
     real    maxSizeSeg( void );
     uint32  argMaxSizeSeg( void );
+
+    void save( QString filename );
 
     void reparametri( const qMyLine& line);
 
