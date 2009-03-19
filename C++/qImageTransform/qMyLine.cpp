@@ -9,6 +9,9 @@
 #include <fstream>
 #include <string>
 
+#include <QFile>
+#include <QTextStream>
+
 #include "qMyLine.h"
 #include <primitive_types.h>
 #include <primitive_const.h>
@@ -100,48 +103,51 @@ void qMyLine::insertPoint( QPointF p , uint32 d )
 }
 
 
-void qMyLine::save( std::string fileName )
+void qMyLine::save( QString fileName )
 {
-     if (!fileName.isEmpty())
+    if (!fileName.isEmpty())
     {
-         std::ifstream outFile;
-         outFile.open ( fileName , std::ifstream::app);
-         outFile << "N" << std::endl ;
-         outFile << this->_pointCount << std::endl;
-         for (uint32 i = 0 ; i < this->_pointCount ; ++i )
-         {
-            outFile << this->_points[i].x() << " " << this->_points[i].y() << std::endl;
-         }
-         outFile << "N" << std::endl ;
+        QFile outFile(fileName);
+        if( outFile.open ( QIODevice::Append | QIODevice::Text) )
+        {
+            QTextStream out(&outFile);
+            out << "N\n" ;
+            out << this->_pointCount << "\n";
+            for (uint32 i = 0 ; i < this->_pointCount ; ++i )
+            {
+                out << this->_points[i].x() << " " << this->_points[i].y() <<  "\n";
+            }
+        }
      }
 }
 
-void qMyLine::load(  std::string fileName , uint32 curve )
+void qMyLine::load( QString fileName  , uint32 curve )
 {
-     if (!fileName.isEmpty())
+    if (!fileName.isEmpty())
     {
-         this->clear();
-         std::ifstream inFile;
-         inFile.open ( fileName , std::ifstream::in);
-         uint32 count = 0 ;
-         while( count < curve )
-         {
-             std::string tmp;
-             inFile >> &tmp ;
-             if( tmp.compare("N") == 0 ) ++count;
-             if( tmp.compare("\eof") == 0 ) return;
-         }
+        this->clear();
+        QFile inFile( fileName );
+        if( inFile.open ( QIODevice::ReadOnly | QIODevice::Text ) )
+        {
+            QTextStream in(&inFile);
+            uint32 count = 0 ;
+            while( ( count < curve ) && !in.atEnd() )
+            {
+                QString line = in.readLine();
+                if( line.compare("N\n") == 0 ) ++count;
+            }
 
-         uint32 numberOfPoints;
-         inFile >> &numberOfPoints;
-         for(uint32 i = 0 ; i < numberOfPoints ; ++i )
-         {
-             float x , y;
-             inFile >> &x >> &y;
-             QPointF p( x , y);
-             this->insertPoint(p);
-         }
-     }
+            uint32 numberOfPoints;
+            in >> numberOfPoints;
+            for(uint32 i = 0 ; i < numberOfPoints ; ++i )
+            {
+                float x , y;
+                in >> x ; in >> y ;
+                QPointF p( x , y);
+                this->insertPoint(p);
+            }
+        }
+    }
 }
 
 void qMyLine::chaikinFilter( uint16 nOfsimplify )
