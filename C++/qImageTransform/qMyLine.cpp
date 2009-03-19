@@ -100,12 +100,12 @@ void qMyLine::insertPoint( QPointF p , uint32 d )
 }
 
 
-void qMyLine::save( QString filename )
+void qMyLine::save( std::string fileName )
 {
      if (!fileName.isEmpty())
     {
          std::ifstream outFile;
-         outFile.open ( filename , std::ifstream::app);
+         outFile.open ( fileName , std::ifstream::app);
          outFile << "N" << std::endl ;
          outFile << this->_pointCount << std::endl;
          for (uint32 i = 0 ; i < this->_pointCount ; ++i )
@@ -116,12 +116,13 @@ void qMyLine::save( QString filename )
      }
 }
 
-void qMyLine::load( QString filename , uint32 curve )
+void qMyLine::load(  std::string fileName , uint32 curve )
 {
      if (!fileName.isEmpty())
     {
+         this->clear();
          std::ifstream inFile;
-         inFile.open ( filename , std::ifstream::in);
+         inFile.open ( fileName , std::ifstream::in);
          uint32 count = 0 ;
          while( count < curve )
          {

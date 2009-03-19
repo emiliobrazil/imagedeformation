@@ -72,6 +72,7 @@ public:
     uint32  argMaxSizeSeg( void );
 
     void save( QString filename );
+    void load( QString fileName , uint32 curve );
 
     void reparametri( const qMyLine& line);
 
