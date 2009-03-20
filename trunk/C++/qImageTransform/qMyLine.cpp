@@ -125,7 +125,6 @@ void qMyLine::load( QString fileName  , uint32 curve )
 {
     if (!fileName.isEmpty())
     {
-        this->clear();
         QFile inFile( fileName );
         if( inFile.open ( QIODevice::ReadOnly | QIODevice::Text ) )
         {
@@ -134,17 +133,20 @@ void qMyLine::load( QString fileName  , uint32 curve )
             while( ( count < curve ) && !in.atEnd() )
             {
                 QString line = in.readLine();
-                if( line.compare("N\n") == 0 ) ++count;
+                if( line.compare("N") == 0 ) ++count;
             }
-
-            uint32 numberOfPoints;
-            in >> numberOfPoints;
-            for(uint32 i = 0 ; i < numberOfPoints ; ++i )
+            if( count == curve )
             {
-                float x , y;
-                in >> x ; in >> y ;
-                QPointF p( x , y);
-                this->insertPoint(p);
+                this->clear();
+                uint32 numberOfPoints;
+                in >> numberOfPoints;
+                for(uint32 i = 0 ; i < numberOfPoints ; ++i )
+                {
+                    float x , y;
+                    in >> x ; in >> y ;
+                    QPointF p( x , y);
+                    this->insertPoint(p);
+                }
             }
         }
     }

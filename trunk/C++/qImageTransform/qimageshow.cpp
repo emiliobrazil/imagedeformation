@@ -275,14 +275,33 @@ void qImageShow::_drawVectorField( QPainter &painter )
     }
 }
 
-
 void qImageShow::keyPressEvent ( QKeyEvent * event )
 {
+    QString fileName;
     std::pair< uint32,QPointF > pairTeste ;
     switch ( event->key() )
     {
     case Qt::Key_Q:
         qApp->quit();
+        break;
+
+    case Qt::Key_0:
+        fileName = QFileDialog::getSaveFileName(this,tr("Export Lines"), QDir::currentPath()+"/lineNew.lin",tr("lines (*.lin)"));
+        if(!fileName.isEmpty())
+        {
+            this->_lineA.save(fileName);
+            this->_lineB.save(fileName);
+        }
+        break;
+    case Qt::Key_9:
+        fileName = QFileDialog::getOpenFileName(this,tr("Load Lines"), QDir::currentPath(),tr("lines (*.lin)\nall (*.*)"));
+        if(!fileName.isEmpty())
+        {
+            this->_lineA.load( fileName , 1 );
+            this->_lineB.load( fileName , 2 );
+            this->_showLineA = true;
+            this->_showLineB = true;
+        }
         break;
 
     case Qt::Key_D:

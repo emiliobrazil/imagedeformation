@@ -12,7 +12,7 @@
 #include <QVector>
 #include <QString>
 
-#include <Vector2D.h>
+#include "Vector2D.h"
 #include "primitive_types.h"
 
 /**
@@ -72,7 +72,7 @@ public:
     uint32  argMaxSizeSeg( void );
 
     void save( QString filename );
-    void load( QString fileName , uint32 curve );
+    void load( QString fileName , uint32 curve = 1 );
 
     void reparametri( const qMyLine& line);
 
