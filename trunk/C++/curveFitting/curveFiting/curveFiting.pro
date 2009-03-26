@@ -6,7 +6,10 @@ TARGET = curveFiting
 TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
-    lineScan.cpp
+    lineScan.cpp \
+    drawarea.cpp
 HEADERS += mainwindow.h \
-    lineScan.h
+    lineScan.h \
+    drawarea.h
+
 INCPATH += ../../bibliotecas/eVector/
