@@ -27,7 +27,6 @@ void DrawArea::mouseMoveEvent(QMouseEvent *event)
     {
        dda( this->_image , this->_lastPoint , event->pos() , 20 );
        this->_lastPoint = event->pos();
-       std::cerr << event->pos().x() << " -- " << event->pos().y() << std::endl;
     }
 
     update();
