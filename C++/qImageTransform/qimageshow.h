@@ -26,7 +26,6 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
-
     void keyPressEvent ( QKeyEvent * event );
 
     void _drawLine( QPainter &painter );

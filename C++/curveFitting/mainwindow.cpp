@@ -6,7 +6,7 @@
 #include <QtGui>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QWidget(parent)
 {
     QPushButton *quit = new QPushButton(tr("&Quit"));
     quit->setFont(QFont("Times", 10, QFont::Bold));
@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(quit, SIGNAL(clicked()), qApp, SLOT(quit()));
 
 
-    DrawArea *draw = new DrawArea;
+    DrawArea *draw = new DrawArea(this);
 
     QGridLayout *gridLayout = new QGridLayout;
     gridLayout->addWidget(quit, 0, 0);
@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     setLayout(gridLayout);
     setWindowTitle(tr("Curve"));
 
+    this->resize( 1024, 800);
 }
 
 MainWindow::~MainWindow()
