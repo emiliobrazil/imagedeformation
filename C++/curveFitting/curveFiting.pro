@@ -7,9 +7,10 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
     lineScan.cpp \
-    drawarea.cpp
+    drawarea.cpp \
+    distancefield.cpp
 HEADERS += mainwindow.h \
     lineScan.h \
-    drawarea.h
-
+    drawarea.h \
+    distancefield.h
 INCPATH += ../../bibliotecas/eVector/
