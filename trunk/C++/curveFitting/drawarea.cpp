@@ -53,7 +53,7 @@ void DrawArea::paintEvent(QPaintEvent *event)
 
 //    painter.drawImage( 0 , 0 , this->_image) ;
 
-    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_distance.toImageRGB() );
+    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_distance.toImageRGBTest() );
     if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_distance.toImageDx() );
     if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_distance.toImageDy() );
     if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_distance.toImageD() );

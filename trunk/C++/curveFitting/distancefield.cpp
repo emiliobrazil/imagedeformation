@@ -201,7 +201,7 @@ QImage DistanceField::toImageDx( void )
             if( this->dx( i , j) < INF )
             {
                 int v = (int)( ( ( this->dx( i , j) + r ) *invMax)*255.0f);
-                QRgb grey = qRgb( v, 0, 0 );
+                QRgb grey = qRgb( 0, 0, v );
                 image.setPixel( i , j , grey );
             }
         }
@@ -245,7 +245,7 @@ QImage DistanceField::toImageD( void )
             if( this->dx( i , j) < INF )
             {
                 int v = (int)( sqrt( ( this->dx(i , j) * this->dx(i , j) + this->dy(i , j) * this->dy(i , j) ) * invMax ) * 255.0f);
-                QRgb grey = qRgb( 0, 0, v );
+                QRgb grey = qRgb( v, 0, 0 );
                 image.setPixel( i , j , grey );
             }
         }
@@ -267,10 +267,37 @@ QImage DistanceField::toImageRGB( void )
         {
             if( this->dx( i , j ) < INF )
             {
-                int red = (int)( ( ( this->dx( i , j) + r ) *invMax)*255.0f);
+                int blue = (int)( ( ( this->dx( i , j) + r ) *invMax)*255.0f);
                 int green = (int)( ( ( this->dy( i , j) + r ) *invMax)*255.0f);
-                int blue = (int)( sqrt( ( this->dx( i , j) * this->dx( i , j) + this->dy( i , j) * this->dy( i , j) ) *invMaxS) * 255.0f);
+                int red = (int)( sqrt( ( this->dx( i , j) * this->dx( i , j) + this->dy( i , j) * this->dy( i , j) ) *invMaxS) * 255.0f);
                 QRgb color = qRgb( red, green, blue );
+                image.setPixel( i , j , color );
+            }
+        }
+    }
+    return image;
+}
+
+QImage DistanceField::toImageRGBTest( void )
+{
+    real r = (real)(this->_radius) + 2.0 ;
+    uint32 r2 = 2*this->_radius;
+    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real invMaxS = 1.0/(2*r*r);
+    real invMax = 1.0/(2.0f*r);
+
+    for ( int i = 0 ; i < (int)this->_w ; ++i )
+    {
+        for ( int j = 0 ; j < (int)this->_h ; ++j )
+        {
+            if( this->dx( i , j ) < INF )
+            {
+                real u = (real)rand()/(real)RAND_MAX;
+                real v = (real)rand()/(real)RAND_MAX;
+                int blue = (int)( ( ( this->dx( (real)i + u , (real)j + v) + r ) *invMax)*255.0f);
+                int green = (int)( ( ( this->dy((real)i + u , (real)j + v) + r ) *invMax)*255.0f);
+                int red = (int)( sqrt( ( this->dx( i , j) * this->dx( i , j) + this->dy( i , j) * this->dy( i , j) ) *invMaxS) * 255.0f);
+                QRgb color = qRgb( 0 , green , blue );
                 image.setPixel( i , j , color );
             }
         }
