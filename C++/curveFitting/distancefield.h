@@ -25,6 +25,8 @@ public:
     void putLine( QPointF a , QPointF b ) ;
     void putPoint( QPointF a ) ;
 
+    QImage toImageRGBTest( void );
+
     QImage toImageDx( void );
     QImage toImageDy( void );
     QImage toImageD( void );
