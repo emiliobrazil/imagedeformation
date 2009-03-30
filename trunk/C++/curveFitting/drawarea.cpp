@@ -1,6 +1,9 @@
 #include "drawarea.h"
 #include "lineScan.h"
 
+#include "distancefield.h"
+
+
 #include <iostream>
 #include <QPainter>
 

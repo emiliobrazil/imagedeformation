@@ -33,9 +33,9 @@ void dda( QImage &image , QPointF a , QPointF b , real ddx , real ddy )
     {
         x+=xIncrement;
         y+=yIncrement;
-        image.setPixel( ROUND(x  ) , ROUND(y  ), qRgb( ROUND(ddx  ) , ROUND(ddy  ) , 0 ) );
-        image.setPixel( ROUND(x-1) , ROUND(y  ), qRgb( ROUND(ddx-1) , ROUND(ddy  ) , 0 ) );
-        image.setPixel( ROUND(x  ) , ROUND(y-1), qRgb( ROUND(ddx  ) , ROUND(ddy-1) , 0 ) );
+//        image.setPixel( ROUND(x  ) , ROUND(y  ), qRgb( ROUND(ddx  ) , ROUND(ddy  ) , 0 ) );
+//        image.setPixel( ROUND(x-1) , ROUND(y  ), qRgb( ROUND(ddx-1) , ROUND(ddy  ) , 0 ) );
+//        image.setPixel( ROUND(x  ) , ROUND(y-1), qRgb( ROUND(ddx  ) , ROUND(ddy-1) , 0 ) );
         image.setPixel( ROUND(x-1) , ROUND(y-1), qRgb( ROUND(ddx-1) , ROUND(ddy-1) , 0 ) );
     }
 
