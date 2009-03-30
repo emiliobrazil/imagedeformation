@@ -10,8 +10,18 @@
 DrawArea::DrawArea(QWidget *parent)
     :QWidget(parent)
 {
-    this->_image = QImage( 1024, 780 ,QImage::Format_ARGB32 );
+    uint32 w = 1024 , h = 900 ;
+//    this->_image = QImage( w, h ,QImage::Format_ARGB32 );
+    this->resize( w , h );
     this->setFocusPolicy(Qt::ClickFocus);
+    this->_radius = 20;
+    this->_distance = DistanceField( w , h , this->_radius  );
+
+    this->_showDistanceFieldRGB = false;
+    this->_showDistanceFieldDx = false ;
+    this->_showDistanceFieldDy = false ;
+    this->_showDistanceFieldD = false ;
+
 }
 
 void DrawArea::mousePressEvent(QMouseEvent *event)
@@ -28,8 +38,10 @@ void DrawArea::mouseMoveEvent(QMouseEvent *event)
 {
     if(  event->buttons() == Qt::LeftButton )
     {
-        pBox( this->_image , this->_lastPoint , 20  );
-        dda( this->_image , this->_lastPoint , event->pos() , 20 );
+        this->_distance.putPoint( this->_lastPoint );
+        this->_distance.putLine(this->_lastPoint , event->pos() );
+//        pBox( this->_image , this->_lastPoint , 20  );
+//        dda( this->_image , this->_lastPoint , event->pos() , 20 );
         this->_lastPoint = event->pos();
     }
     update();
@@ -39,7 +51,13 @@ void DrawArea::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    painter.drawImage( 0 , 0 , this->_image) ;
+//    painter.drawImage( 0 , 0 , this->_image) ;
+
+    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_distance.toImageRGB() );
+    if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_distance.toImageDx() );
+    if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_distance.toImageDy() );
+    if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_distance.toImageD() );
+
 }
 
 void DrawArea::resizeEvent(QResizeEvent *event)
@@ -56,8 +74,21 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
     case Qt::Key_Q:
         qApp->quit();
         break;
+    case Qt::Key_S:
+        this->_showDistanceFieldRGB = !this->_showDistanceFieldRGB;
+        break;
+    case Qt::Key_X:
+        this->_showDistanceFieldDx = !this->_showDistanceFieldDx ;
+        break;
+    case Qt::Key_Y:
+        this->_showDistanceFieldDy = !this->_showDistanceFieldDy ;
+        break;
+    case Qt::Key_D:
+        this->_showDistanceFieldD = !this->_showDistanceFieldD ;
+        break;
     case Qt::Key_C:
-        this->_image = QImage( 1024, 780 ,QImage::Format_ARGB32 );
+        //        this->_image = QImage( 1024, 780 ,QImage::Format_ARGB32 );
+        this->_distance.clear();
         break;
     default:
         QWidget::keyPressEvent ( event );
