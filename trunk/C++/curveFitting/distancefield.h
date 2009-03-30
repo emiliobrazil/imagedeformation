@@ -1,6 +1,8 @@
 #ifndef DISTANCEFIELD_H
 #define DISTANCEFIELD_H
 
+#include <iostream>
+
 #include <QPoint>
 #include <QImage>
 #include <vector>
@@ -11,11 +13,12 @@
 class DistanceField
 {
 public:
+    DistanceField( void ){ std::cerr << "initialize {}" << std::endl;  }
     DistanceField( uint32 w , uint32 h , uint32 radius );
     ~DistanceField( void ){}
 
     inline real dx( int i , int j ){ return this->_dx[ this->_index( i , j ) ];}
-    inline real dy( int i , int j ){ return this->_dx[ this->_index( i , j ) ];}
+    inline real dy( int i , int j ){ return this->_dy[ this->_index( i , j ) ];}
     real dx( real x , real y ) ;
     real dy( real x , real y ) ;
 
@@ -37,7 +40,7 @@ public:
 protected:
     inline void _setDx( int i , int j , real v ){ this->_dx[ this->_index( i , j ) ] = v ; }
     inline void _setDy( int i , int j , real v ){ this->_dy[ this->_index( i , j ) ] = v ; }
-    inline uint32 _index( int i , int j ){ return ( i + this->_radius )*( this->_w + 2 * this->_radius ) + ( j + this->_radius );}
+    inline uint32 _index( int i , int j ){ return ( j + this->_radius )*( this->_w + (2 * this->_radius) ) + ( i + this->_radius ); }
 
     inline real _kBilinear( real x ){
         if (x<-1.0f) return 0.0f;

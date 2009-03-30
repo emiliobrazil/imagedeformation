@@ -12,6 +12,7 @@ DistanceField::DistanceField( uint32 w , uint32 h , uint32 radius )
     this->_numberOfElements = (w+2*radius)*(h+2*radius);
     this->_dx = std::vector<real> ( this->_numberOfElements , INF );
     this->_dy = std::vector<real> ( this->_numberOfElements , INF );
+    std::cerr << "initialize { normal } _numberOfElements = " << this->_numberOfElements << std::endl;
 }
 
 real DistanceField::dx( real x , real y )
@@ -78,7 +79,6 @@ real DistanceField::dy( real x , real y )
 
 void DistanceField::putLine( QPointF a , QPointF b )
 {
-
     real hx = b.y() - a.y();
     real hy = a.x() - b.x();
 
@@ -90,9 +90,6 @@ void DistanceField::putLine( QPointF a , QPointF b )
     hx = 2.0 * this->_radius * ( ttx ) ;
     hy = 2.0 * this->_radius * ( tty ) ;
 
-    real xIncrement;
-    real yIncrement;
-
     real ddx =  -( 0.5 * hx );
     real ddy =  -( 0.5 * hy );
 
@@ -101,57 +98,56 @@ void DistanceField::putLine( QPointF a , QPointF b )
 
     uint32 step = ( ABS( hx ) > ABS( hy ) ) ? (uint32)ABS( hx ) : (uint32)ABS( hy ) ;
 
-    xIncrement = hx/(real)step;
-    yIncrement = hy/(real)step;
+    real xIncrement = hx/(real)step;
+    real yIncrement = hy/(real)step;
 
     for( uint32 i = 0 ; i < step ; i++ )
     {
         real dxTMP = x2 - x1;
         real dyTMP = y2 - y1;
 
-        uint32 stepTMP;
+        real xTMP = x1;
+        real yTMP = y1;
 
-        real xIncrementTMP;
-        real yIncrementTMP;
+        uint32 stepTMP = ( ABS( dxTMP ) > ABS( dyTMP ) ) ? (uint32)ABS( dxTMP ) : (uint32)ABS( dyTMP ) ;
 
-        real xTMP = x1 , yTMP = y1;
         real stepInvTMP = 1.0/(real)stepTMP;
 
-        stepTMP = ( ABS( dxTMP ) > ABS( dyTMP ) ) ? (uint32)ABS( dxTMP ) : (uint32)ABS( dyTMP ) ;
+        real xIncrementTMP = dxTMP*stepInvTMP;
+        real yIncrementTMP = dyTMP*stepInvTMP;
 
-        xIncrementTMP = dxTMP*stepInvTMP;
-        yIncrementTMP = dyTMP*stepInvTMP;
-
-        for( uint32 j = 0 ; j < step ; i++ )
+        for( uint32 j = 0 ; j < stepTMP ; j++ )
         {
-            int xij = ROUND( xTMP ) , yij = ROUND( yTMP );
+            int xij = ROUND( xTMP ) ;
+            int yij = ROUND( yTMP );
 
-            int Neighbor[2] = { 0 , 1 };
-            for( uint k = 0 ; k < 2 ; ++k)
+            for( int k = 0 ; k < 2 ; ++k)
             {
-                for( uint k = 0 ; k < 2 ; ++l)
+                for( int l = 0 ; l < 2 ; ++l)
                 {
-                    if( this->dx( xij , yij ) < INF )
+                    real tmpVx = ddx + k*ttx ;
+                    real tmpVy = ddy + l*tty ;
+
+                    if( this->dx( xij + k , yij + l ) < INF )
                     {
-                        real tmpDx = this->dx( xij + Neighbor[k] , yij + Neighbor[l]  ) , tmpDy =  this->dy( xij + Neighbor[k] , yij + Neighbor[l]  ) ;
-                        if( ( tmpDx*tmpDx + tmpDx*tmpDx ) <  ( (ddx + Neighbor[k]*ttx)*(ddx + Neighbor[k]*ttx) + (ddy + Neighbor[l]*tty)*(ddy + Neighbor[l]*tty) ) )
+                        real tmpD = ( this->dx( xij + k , yij + l  ) * this->dx( xij + k , yij + l  ) ) +
+                                    ( this->dy( xij + k , yij + l  ) * this->dy( xij + k , yij + l  ) ) ;
+                        if( ( tmpD ) >  ( (tmpVx*tmpVx) + (tmpVy*tmpVy) ) )
                         {
-                            this->_setDx( xij + Neighbor[k] , yij + Neighbor[l] , (ddx + Neighbor[k]*ttx) ) ;
-                            this->_setDy( xij + Neighbor[k] , yij + Neighbor[l] , (ddy + Neighbor[l]*tty) ) ;
+                            this->_setDx( xij + k , yij + l , tmpVx ) ;
+                            this->_setDy( xij + k , yij + l , tmpVy ) ;
                         }
                     }
                     else
                     {
-                        this->_setDx( xij + Neighbor[k] , yij + Neighbor[l] , (ddx + Neighbor[k]*ttx) ) ;
-                        this->_setDy( xij + Neighbor[k] , yij + Neighbor[l] , (ddy + Neighbor[l]*tty) ) ;
+                        this->_setDx( xij + k , yij + l , tmpVx ) ;
+                        this->_setDy( xij + k , yij + l , tmpVy ) ;
                     }
                 }
             }
-
             xTMP+=xIncrementTMP;
             yTMP+=yIncrementTMP;
         }
-
         x1+=xIncrement;
         x2+=xIncrement;
         y1+=yIncrement;
@@ -160,31 +156,32 @@ void DistanceField::putLine( QPointF a , QPointF b )
         ddx+=xIncrement;
         ddy+=yIncrement;
     }
-
 }
 
 void DistanceField::putPoint( QPointF a )
 {
-    for(uint32 i = 0 ; i < 2*this->_radius ; ++i )
+    uint32 r2 = 2*this->_radius;
+
+    for(uint32 i = 0 ; i < r2 ; ++i )
     {
-        for(uint32 j = 0 ; j < 2*this->_radius ; ++j )
+        for(uint32 j = 0 ; j < r2 ; ++j )
         {
-            int ddx =  i - radius ;
-            int ddy =  j - radius ;
-            int xij = ROUND(X.x()) + ddx, yij = ROUND(X.y()) + ddy ;
+            int ddx =  i - this->_radius ;
+            int ddy =  j - this->_radius ;
+            int xij = ROUND(a.x()) + ddx, yij = ROUND(a.y()) + ddy ;
             if( this->dx( xij , yij ) < INF )
             {
                 real tmpDx = this->dx( xij ,yij ) , tmpDy =  this->dy( xij ,yij ) ;
-                if( ( tmpDx*tmpDx + tmpDx*tmpDx ) <  ( (ddx * ddx ) + ( ddy * ddy ) ) )
+                if( ( tmpDx*tmpDx + tmpDy*tmpDy ) >  ( (ddx * ddx ) + ( ddy * ddy ) ) )
                 {
-                    this->_setDx( xij ,yij , ddx ) ;
-                    this->_setDy( xij ,yij , ddy ) ;
+                    this->_setDx( xij ,yij , (real)ddx ) ;
+                    this->_setDy( xij ,yij , (real)ddy ) ;
                 }
             }
             else
             {
-                this->_setDx( xij ,yij , ddx ) ;
-                this->_setDy( xij ,yij , ddy ) ;
+                this->_setDx( xij ,yij , (real)ddx ) ;
+                this->_setDy( xij ,yij , (real)ddy ) ;
             }
         }
     }
@@ -193,83 +190,90 @@ void DistanceField::putPoint( QPointF a )
 QImage DistanceField::toImageDx( void )
 {
     real r = (real)(this->_radius) + 2.0 ;
-    QImage image( this->_w , this->_h , QImage::Format_Mono );
-    real invMax = 1.0/(real)2.0f*r;
+    uint32 r2 = 2*this->_radius;
+    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real invMax = 1.0/(2.0f*r);
 
-    for ( uint32 i = 0 ; i < this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->_w ; ++i )
     {
-        if( this->dx( i , j) < INF )
+        for ( int j = 0 ; j < (int)this->_h ; ++j )
         {
-            for ( uint32 j = 0 ; j < this->_w ; ++j )
+            if( this->dx( i , j) < INF )
             {
                 int v = (int)( ( ( this->dx( i , j) + r ) *invMax)*255.0f);
-                QRgb grey = qRgb( v, v, v );
+                QRgb grey = qRgb( v, 0, 0 );
                 image.setPixel( i , j , grey );
             }
         }
     }
+    return image;
 }
 
 QImage DistanceField::toImageDy( void )
 {
     real r = (real)(this->_radius) + 2.0 ;
-    QImage image( this->_w , this->_h , QImage::Format_Mono );
-    real invMax = 1.0/(real)2.0f*r;
+    uint32 r2 = 2*this->_radius;
+    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real invMax = 1.0/(2.0f*r);
 
-    for ( uint32 i = 0 ; i < this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->_w ; ++i )
     {
-        for ( uint32 j = 0 ; j < this->_w ; ++j )
+        for ( int j = 0 ; j < (int)this->_h ; ++j )
         {
             if( this->dx( i , j) < INF )
             {
                 int v = (int)( ( ( this->dy( i , j) + r ) *invMax)*255.0f);
-                QRgb grey = qRgb( v, v, v );
+                QRgb grey = qRgb( 0, v , 0 );
                 image.setPixel( i , j , grey );
             }
         }
     }
+    return image;
 }
 
 QImage DistanceField::toImageD( void )
 {
     real r = (real)(this->_radius) + 2.0 ;
-    QImage image( this->_w , this->_h , QImage::Format_Mono );
-    real invMax = 1.0/(real)r*r;
+    uint32 r2 = 2*this->_radius;
+    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real invMax = 1.0/(2*r*r);
 
-    for ( uint32 i = 0 ; i < this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->_w ; ++i )
     {
-        for ( uint32 j = 0 ; j < this->_w ; ++j )
+        for ( int j = 0 ; j < (int)this->_h ; ++j )
         {
             if( this->dx( i , j) < INF )
             {
-                int v = (int)( ( ( this->dx( i , j) * this->dx( i , j) + this->dy( i , j) * this->dy( i , j) ) *invMax) * 255.0f);
-                QRgb grey = qRgb( v, v, v );
+                int v = (int)( sqrt( ( this->dx(i , j) * this->dx(i , j) + this->dy(i , j) * this->dy(i , j) ) * invMax ) * 255.0f);
+                QRgb grey = qRgb( 0, 0, v );
                 image.setPixel( i , j , grey );
             }
         }
     }
+    return image;
 }
 
 QImage DistanceField::toImageRGB( void )
 {
     real r = (real)(this->_radius) + 2.0 ;
-    QImage image( this->_w , this->_h , QImage::Format_ARGB32 );
-    real invMaxS = 1.0/(real)r*r;
-    real invMax = 1.0/(real)2.0f*r;
+    uint32 r2 = 2*this->_radius;
+    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real invMaxS = 1.0/(2*r*r);
+    real invMax = 1.0/(2.0f*r);
 
-    for ( uint32 i = 0 ; i < this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->_w ; ++i )
     {
-        for ( uint32 j = 0 ; j < this->_w ; ++j )
+        for ( int j = 0 ; j < (int)this->_h ; ++j )
         {
-            if( this->dx( i , j) < INF )
+            if( this->dx( i , j ) < INF )
             {
-                int g = (int)( ( ( this->dx( i , j) * this->dx( i , j) + this->dy( i , j) * this->dy( i , j) ) *invMaxS) * 255.0f);
-                int r = (int)( ( ( this->dy( i , j) + r ) *invMax)*255.0f);
-                int b = (int)( ( ( this->dy( i , j) + r ) *invMax)*255.0f);
-
-                QRgb grey = qRgb( v, v, v );
-                image.setPixel( i , j , grey );
+                int red = (int)( ( ( this->dx( i , j) + r ) *invMax)*255.0f);
+                int green = (int)( ( ( this->dy( i , j) + r ) *invMax)*255.0f);
+                int blue = (int)( sqrt( ( this->dx( i , j) * this->dx( i , j) + this->dy( i , j) * this->dy( i , j) ) *invMaxS) * 255.0f);
+                QRgb color = qRgb( red, green, blue );
+                image.setPixel( i , j , color );
             }
         }
     }
+    return image;
 }

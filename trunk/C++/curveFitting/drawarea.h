@@ -7,6 +7,7 @@
 
 #include <QImage>
 
+#include "distancefield.h"
 
 class DrawArea : public QWidget
 {
@@ -23,6 +24,13 @@ protected:
 private:
     QImage _image;
     QPointF _lastPoint;
+    DistanceField _distance;
+    uint32 _radius;
+
+    bool _showDistanceFieldRGB;
+    bool _showDistanceFieldDx;
+    bool _showDistanceFieldDy;
+    bool _showDistanceFieldD;
 
 };
 
