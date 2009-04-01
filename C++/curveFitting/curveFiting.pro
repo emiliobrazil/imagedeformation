@@ -8,9 +8,13 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     lineScan.cpp \
     drawarea.cpp \
-    distancefield.cpp
+    distancefield.cpp \
+    cubicsegment.cpp \
+    curvepath.cpp
 HEADERS += mainwindow.h \
     lineScan.h \
     drawarea.h \
-    distancefield.h
+    distancefield.h \
+    cubicsegment.h \
+    curvepath.h
 INCPATH += ../../bibliotecas/eVector/
