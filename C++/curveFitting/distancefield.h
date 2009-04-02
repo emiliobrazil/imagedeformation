@@ -24,6 +24,8 @@ public:
     real dx( real x , real y ) ;
     real dy( real x , real y ) ;
 
+    inline QPointF dxdy( QPointF p ){ return QPointF( dx( (real)p.x() , (real)p.y() ) , dy( (real)p.x() , (real)p.y() ) ); }
+
     void putLine( QPointF a , QPointF b ) ;
     void putPoint( QPointF a ) ;
 

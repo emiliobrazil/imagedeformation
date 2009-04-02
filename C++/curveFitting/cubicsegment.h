@@ -3,6 +3,8 @@
 
 #include <QPoint>
 #include <QPainter>
+#include <primitive_types.h>
+
 
 class CubicSegment
 {
@@ -17,15 +19,15 @@ public:
     void setC2( QPointF C2 ){ this->_C2 = C2 ;}
     void setC3( QPointF C3 ){ this->_C0 = C3 ;}
 
-    QPointF eval( real t ){ return this->_C0*( (1.0-t)*(1.0-t)*(1.0-t) ) +
-                                   this->_C1*(   3.0*t*(1.0-t)*(1.0-t) ) +
-                                   this->_C2*(   3.0*t*   t   *(1.0-t) ) +
-                                   this->_C3*(    t   *   t   *   t    ) ;}
+    inline QPointF eval( real t ){ return this->_C0*( (1.0-t)*(1.0-t)*(1.0-t) ) +
+                                          this->_C1*(   3.0*t*(1.0-t)*(1.0-t) ) +
+                                          this->_C2*(   3.0*t*   t   *(1.0-t) ) +
+                                          this->_C3*(    t   *   t   *   t    ) ;}
 
     QPointF getC0( void ){ return this->_C0 ;}
     QPointF getC1( void ){ return this->_C1 ;}
     QPointF getC2( void ){ return this->_C2 ;}
-    QPointF getC3( void ){ return this->_C0  ;}
+    QPointF getC3( void ){ return this->_C3 ;}
 
     void draw( QPainter &painter );
 
