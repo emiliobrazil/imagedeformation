@@ -15,12 +15,12 @@ public:
 
     void addPoint( QPointF p );
     void draw( QPainter &painter );
-    CurvePath curve( void );
+    CurvePath& curve( void );
 
 protected:
-    enum _results{ CORNER , SUCCESS , FAILURE } ;
+    enum RESULT{ CORNER , SUCCESS , FAILURE , } ;
 
-    _results _update( QPointF p ) ;
+    RESULT _update( QPointF p ) ;
     bool _testeCorner( QPointF p ) ;
     real _erro( void ) ;
 
