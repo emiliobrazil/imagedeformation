@@ -11,6 +11,8 @@ public:
 
     void addSegment( CubicSegment segment ){ this->_segment.push_back( segment );}
 
+    QPointF tanC3last( void ){ uint32 d = this->_segment.size(); return this->_segment[d].getC1(); }
+
     void draw( QPainter &painter );
 
 private:
