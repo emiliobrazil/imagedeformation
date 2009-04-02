@@ -59,6 +59,10 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
     while ( ( this->_erro() < _MAX_ERRO_ ) && ( nInteration < _MAX_ITERATION_ ) )
     {
         QPointF f1( 0 , 0 ) , f2( 0 , 0 ) ;
+        for( uint32 i = 0 ; i < _N_SAMPLES_ ;++i )
+        {
+
+        }
         ++nInteration;
     }
 }
