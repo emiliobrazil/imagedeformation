@@ -8,6 +8,7 @@
 #include <QImage>
 
 #include "distancefield.h"
+#include "cubiccurvefitter.h"
 
 class DrawArea : public QWidget
 {
@@ -32,6 +33,8 @@ private:
     bool _showDistanceFieldDy;
     bool _showDistanceFieldD;
 
+    CubicCurveFitter _cubicCurve;
 };
+
 
 #endif // DRAWAREA_H

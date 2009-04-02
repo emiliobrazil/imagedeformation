@@ -1,5 +1,7 @@
 #include "curvepath.h"
 #include <primitive_types.h>
+#include <math.h>
+
 
 void CurvePath::draw( QPainter &painter )
 {
@@ -7,4 +9,10 @@ void CurvePath::draw( QPainter &painter )
     {
         this->_segment[i].draw( painter );
     }
+}
+
+QPointF CurvePath::tanC3last( void )
+{
+    uint32 d = this->_segment.size()-1 ;
+    return this->_segment[d].tanC3();
 }

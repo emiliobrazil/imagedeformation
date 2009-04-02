@@ -1,4 +1,5 @@
 #include "cubicsegment.h"
+#include <math.h>
 
 CubicSegment::CubicSegment()
 {
@@ -32,4 +33,11 @@ void CubicSegment::draw( QPainter &painter )
     path.cubicTo( this->_C1 , this->_C2 , this->_C3);
 
     painter.drawPath(path);
+}
+
+QPointF CubicSegment::tanC3( void )
+{
+    QPointF tan = this->getC2() - this->getC3() ;
+    tan /= sqrt( tan.x()*tan.x() + tan.y()*tan.y() );
+    return tan;
 }

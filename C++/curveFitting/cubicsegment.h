@@ -31,6 +31,8 @@ public:
 
     void draw( QPainter &painter );
 
+    QPointF tanC3( void );
+
 private:
     QPointF _C0 , _C1 , _C2 , _C3;
 

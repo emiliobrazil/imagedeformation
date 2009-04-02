@@ -15,12 +15,18 @@ DrawArea::DrawArea(QWidget *parent)
     this->resize( w , h );
     this->setFocusPolicy(Qt::ClickFocus);
     this->_radius = 20;
-    this->_distance = DistanceField( w , h , this->_radius  );
+
+    this->_distance.initialize( w , h , this->_radius  );
+
+    this->_cubicCurve.initialize(  w ,  h ,  this->_radius );
 
     this->_showDistanceFieldRGB = false;
     this->_showDistanceFieldDx = false ;
     this->_showDistanceFieldDy = false ;
     this->_showDistanceFieldD = false ;
+
+    void addPoint( QPointF p );
+    void draw( QPainter &painter );
 
 }
 
@@ -29,8 +35,8 @@ void DrawArea::mousePressEvent(QMouseEvent *event)
     if(  event->buttons() == Qt::LeftButton )
     {
         this->_lastPoint = event->pos();
+        this->_cubicCurve.addPoint(event->pos());
     }
-
     update();
 }
 
@@ -38,10 +44,11 @@ void DrawArea::mouseMoveEvent(QMouseEvent *event)
 {
     if(  event->buttons() == Qt::LeftButton )
     {
-        this->_distance.putPoint( this->_lastPoint );
-        this->_distance.putLine(this->_lastPoint , event->pos() );
+//        this->_distance.putPoint( this->_lastPoint );
+//        this->_distance.putLine(this->_lastPoint , event->pos() );
 //        pBox( this->_image , this->_lastPoint , 20  );
 //        dda( this->_image , this->_lastPoint , event->pos() , 20 );
+        this->_cubicCurve.addPoint(event->pos() );
         this->_lastPoint = event->pos();
     }
     update();
@@ -53,10 +60,12 @@ void DrawArea::paintEvent(QPaintEvent *event)
 
 //    painter.drawImage( 0 , 0 , this->_image) ;
 
-    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_distance.toImageRGBTest() );
-    if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_distance.toImageDx() );
-    if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_distance.toImageDy() );
-    if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_distance.toImageD() );
+//    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_distance.toImageRGBTest() );
+//    if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_distance.toImageDx() );
+//    if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_distance.toImageDy() );
+//    if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_distance.toImageD() );
+
+    this->_cubicCurve.draw( painter );
 
 }
 

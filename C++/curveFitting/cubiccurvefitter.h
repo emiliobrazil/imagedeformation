@@ -13,6 +13,8 @@ public:
     CubicCurveFitter( void );
     CubicCurveFitter( uint32 w , uint32 h , uint32 radius );
 
+    void initialize( uint32 w , uint32 h , uint32 radius );
+
     void addPoint( QPointF p );
     void draw( QPainter &painter );
     CurvePath& curve( void );
@@ -21,7 +23,7 @@ protected:
     enum RESULT{ CORNER , SUCCESS , FAILURE , } ;
 
     RESULT _update( QPointF p ) ;
-    bool _testeCorner( QPointF p ) ;
+    bool _isCorner( QPointF p ) ;
     real _erro( void ) ;
 
 
