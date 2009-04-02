@@ -24,15 +24,16 @@ void CubicCurveFitter::addPoint( QPointF p )
     this->_NewSegment = false;
     this->_poliline.push_back( p );
     CubicCurveFitter::RESULT rslt = this->_update( p );
-
+    QVector::iterator iEnd = this->_poliline.end();
+    QPointF preview = this->_poliline[ iEnd - 2 ];
     if( rslt != SUCCESS )
     {
         this->_path.addSegment( this->_segment) ;
-        this->_segment.set( p , p , p , p );
+        this->_segment.set( preview , preview , preview , preview );
         this->_field.clear();
-        this->_field.putPoint( p );
-        if( rslt == CORNER ) this->_G1 = false;
-        else this->_G1 = true;
+        this->_update( p ) ;
+        if( rslt == CORNER ) this->_G1 = false ;
+        else this->_G1 = true ;
     }
 }
 
