@@ -1,9 +1,11 @@
 #include "cubiccurvefitter.h"
+#include <math.h>
+#include <primitive_const.h>
 
 #define _MAX_ERRO_ 1
 #define _MAX_ITERATION_ 10
 #define _N_SAMPLES_ 50
-
+#define _CORNER_ANGLE_ (60/180)*PI
 
 CubicCurveFitter::CubicCurveFitter( void )
 {
@@ -18,14 +20,22 @@ CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius )
     this->_NewSegment = true;
 }
 
+void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius )
+{
+    this->_field.initialize(  w ,  h ,  radius );
+    this->_G1 = false;
+    this->_NewSegment = true;
+}
+
+
 void CubicCurveFitter::addPoint( QPointF p )
 {
     if( this->_NewSegment ) this->_segment.set( p , p , p , p );
     this->_NewSegment = false;
     this->_poliline.push_back( p );
     CubicCurveFitter::RESULT rslt = this->_update( p );
-    QVector::iterator iEnd = this->_poliline.end();
-    QPointF preview = this->_poliline[ iEnd - 2 ];
+    uint32 iEnd = this->_poliline.size()-1;
+    QPointF preview = this->_poliline[ iEnd - 1 ];
     if( rslt != SUCCESS )
     {
         this->_path.addSegment( this->_segment) ;
@@ -50,15 +60,20 @@ CurvePath& CubicCurveFitter::curve( void )
 
 CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
 {
-    if( this->_testeCorner( p ) ) return CORNER;
+    if( this->_isCorner( p ) ) return CORNER;
+
     QPointF previewC3 = this->_segment.getC3();
     QPointF previewC2 = this->_segment.getC2();
+    QPointF previewC1 = this->_segment.getC1();
+    QPointF previewC0 = this->_segment.getC0();
+
     this->_segment.setC3(p);
     this->_segment.setC2( this->_segment.getC2() + p - previewC3 );
     this->_field.putPoint( previewC3 );
     this->_field.putLine( previewC3 , p );
     uint32 nInteration = 0;
-    while ( ( this->_erro() < _MAX_ERRO_ ) && ( nInteration < _MAX_ITERATION_ ) )
+    real error = this->_erro();
+    while ( ( error < _MAX_ERRO_ ) && ( nInteration < _MAX_ITERATION_ ) )
     {
         QPointF f1( 0 , 0 ) , f2( 0 , 0 ) ;
         for( uint32 i = 1 ; i < _N_SAMPLES_ ;++i )
@@ -71,14 +86,29 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
         }
         f1*= 6.0/_N_SAMPLES_;
         f2*= 6.0/_N_SAMPLES_;
+        if(this->_G1)
+        {
+            QPointF tan = this->_path.tanC3last();
+            f1 = tan * ( ( tan.x()*f1.x() + tan.y()*f1.y() ) );
+        }
+        this->_segment.setC1( this->_segment.getC1() + f1 );
+        this->_segment.setC2( this->_segment.getC2() + f2 );
+        error = this->_erro();
         ++nInteration;
-        QPointF tan = this->_path.tanC3last();
+        if (error < _MAX_ERRO_ ) return SUCCESS ;
     }
+    this->_segment.set( previewC0 , previewC1 , previewC2, previewC3 ) ;
+    return FAILURE;
 }
 
-bool CubicCurveFitter::_testeCorner( QPointF p )
+bool CubicCurveFitter::_isCorner( QPointF p )
 {
-    return false;
+    if( this->_segment.getC3() == this->_segment.getC2() ) return false;
+    QPointF tan = this->_segment.tanC3();
+    QPointF pTest = p - this->_segment.getC3();
+    pTest /= sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
+    real theta = acos(tan.x()*pTest.x() + tan.y()*pTest.y()) ;
+    return ( theta > _CORNER_ANGLE_ );
 }
 
 real CubicCurveFitter::_erro( void )
