@@ -118,6 +118,8 @@ void qImageShow::_setField()
 
     this->_vectorSamples = std::vector< std::pair<Vector2D,Vector2D > >();
 
+    fprintf(stderr, "Seting Up Field ...\n");
+
     for ( uint32 i = 0 ; i < numberOfA ; ++i)
     {
         Vector2D p(this->_lineA.at(i).x(), this->_lineA.at(i).y());
@@ -206,11 +208,15 @@ void qImageShow::_setField()
     this->_field.setSamples( numberOfsamples , points , vectors );
     delete[] vectors;
     delete[] points;
+    fprintf(stderr, "Field Seted \n");
+
 }
 
 
 void qImageShow::_buildField( void )
 {
+
+    fprintf(stderr, "Building Field ...\n");
 
     this->_field.setRadius( this->_MLSRadius );
 
@@ -236,6 +242,7 @@ void qImageShow::_buildField( void )
             }
         }
     }
+   fprintf(stderr, "Field builded\n");
 }
 
 void qImageShow::_drawVectorField( QPainter &painter )
@@ -318,7 +325,7 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         this->_showMaskF = false;
         this->_showImageFinal = true;
         this->_finalImage = QImage( this->_size , QImage::Format_ARGB32 );
-        this->_finalImage.setAlphaChannel( this->_maskF );
+//        this->_finalImage.setAlphaChannel( this->_maskF );
         this->_setField();
         this->_buildField();
         transformImage( this->_image.toImage() , this->_finalImage , this->_vectorField );
