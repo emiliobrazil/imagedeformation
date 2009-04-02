@@ -10,11 +10,13 @@ SOURCES += main.cpp \
     drawarea.cpp \
     distancefield.cpp \
     cubicsegment.cpp \
-    curvepath.cpp
+    curvepath.cpp \
+    cubiccurvefitter.cpp
 HEADERS += mainwindow.h \
     lineScan.h \
     drawarea.h \
     distancefield.h \
     cubicsegment.h \
-    curvepath.h
+    curvepath.h \
+    cubiccurvefitter.h
 INCPATH += ../../bibliotecas/eVector/

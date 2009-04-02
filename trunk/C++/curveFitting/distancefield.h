@@ -13,9 +13,11 @@
 class DistanceField
 {
 public:
-    DistanceField( void ){ std::cerr << "initialize {}" << std::endl;  }
+    DistanceField( void ){  }
     DistanceField( uint32 w , uint32 h , uint32 radius );
     ~DistanceField( void ){}
+
+    void initialize( uint32 w , uint32 h , uint32 radius );
 
     inline real dx( int i , int j ){ return this->_dx[ this->_index( i , j ) ];}
     inline real dy( int i , int j ){ return this->_dy[ this->_index( i , j ) ];}

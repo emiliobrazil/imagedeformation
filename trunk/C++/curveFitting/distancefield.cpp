@@ -12,8 +12,18 @@ DistanceField::DistanceField( uint32 w , uint32 h , uint32 radius )
     this->_numberOfElements = (w+2*radius)*(h+2*radius);
     this->_dx = std::vector<real> ( this->_numberOfElements , INF );
     this->_dy = std::vector<real> ( this->_numberOfElements , INF );
-    std::cerr << "initialize { normal } _numberOfElements = " << this->_numberOfElements << std::endl;
 }
+
+void DistanceField::initialize( uint32 w , uint32 h , uint32 radius )
+{
+    this->_w = w;
+    this->_h = h;
+    this->_radius = radius;
+    this->_numberOfElements = (w+2*radius)*(h+2*radius);
+    this->_dx = std::vector<real> ( this->_numberOfElements , INF );
+    this->_dy = std::vector<real> ( this->_numberOfElements , INF );
+}
+
 
 real DistanceField::dx( real x , real y )
 {
@@ -297,7 +307,7 @@ QImage DistanceField::toImageRGBTest( void )
                 int blue = (int)( ( ( this->dx( (real)i + u , (real)j + v) + r ) *invMax)*255.0f);
                 int green = (int)( ( ( this->dy((real)i + u , (real)j + v) + r ) *invMax)*255.0f);
                 int red = (int)( sqrt( ( this->dx( i , j) * this->dx( i , j) + this->dy( i , j) * this->dy( i , j) ) *invMaxS) * 255.0f);
-                QRgb color = qRgb( 0 , green , blue );
+                QRgb color = qRgb( red , green , blue );
                 image.setPixel( i , j , color );
             }
         }
