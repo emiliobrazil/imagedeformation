@@ -71,12 +71,13 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
         f1*= 6.0/_N_SAMPLES_;
         f2*= 6.0/_N_SAMPLES_;
         ++nInteration;
+        QPointF tan = this->_path.tanC3last();
     }
 }
 
 bool CubicCurveFitter::_testeCorner( QPointF p )
 {
-    return true;
+    return false;
 }
 
 real CubicCurveFitter::_erro( void )
