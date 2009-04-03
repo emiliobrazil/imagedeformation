@@ -22,7 +22,7 @@ void CubicSegment::set( QPointF C0 , QPointF C1 , QPointF C2 , QPointF C3 )
     this->_C0 = C0 ;
     this->_C1 = C1 ;
     this->_C2 = C2 ;
-    this->_C0 = C3 ;
+    this->_C3 = C3 ;
 }
 
 void CubicSegment::draw( QPainter &painter )

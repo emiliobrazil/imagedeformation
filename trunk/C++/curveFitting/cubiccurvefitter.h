@@ -18,6 +18,7 @@ public:
     void addPoint( QPointF p );
     void draw( QPainter &painter );
     CurvePath& curve( void );
+    QPolygonF& polyline( void ){ return this->_poliline;}
 
 protected:
     enum RESULT{ CORNER , SUCCESS , FAILURE , } ;
