@@ -30,16 +30,22 @@ void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius )
 
 void CubicCurveFitter::addPoint( QPointF p )
 {
-    if( this->_NewSegment ) this->_segment.set( p , p , p , p );
-    this->_NewSegment = false;
+    if( this->_NewSegment )
+    {
+        this->_segment = CubicSegment( p , p , p , p );
+        this->_NewSegment = false;
+        this->_poliline.push_back( p );
+        return;
+    }
     this->_poliline.push_back( p );
-    CubicCurveFitter::RESULT rslt = this->_update( p );
     uint32 iEnd = this->_poliline.size()-1;
     QPointF preview = this->_poliline[ iEnd - 1 ];
+    CubicCurveFitter::RESULT rslt = this->_update( p );
+
     if( rslt != SUCCESS )
     {
         this->_path.addSegment( this->_segment) ;
-        this->_segment.set( preview , preview , preview , preview );
+        this->_segment = CubicSegment( preview , preview , preview , preview );
         this->_field.clear();
         this->_update( p ) ;
         if( rslt == CORNER ) this->_G1 = false ;
@@ -61,6 +67,8 @@ CurvePath& CubicCurveFitter::curve( void )
 CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
 {
     if( this->_isCorner( p ) ) return CORNER;
+
+    std::cerr << "CubicCurveFitter::_update 01" << std::endl;
 
     QPointF previewC3 = this->_segment.getC3();
     QPointF previewC2 = this->_segment.getC2();

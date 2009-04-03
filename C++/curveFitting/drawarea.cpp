@@ -48,7 +48,7 @@ void DrawArea::mouseMoveEvent(QMouseEvent *event)
 //        this->_distance.putLine(this->_lastPoint , event->pos() );
 //        pBox( this->_image , this->_lastPoint , 20  );
 //        dda( this->_image , this->_lastPoint , event->pos() , 20 );
-        this->_cubicCurve.addPoint(event->pos() );
+        this->_cubicCurve.addPoint( event->pos() );
         this->_lastPoint = event->pos();
     }
     update();
@@ -65,8 +65,11 @@ void DrawArea::paintEvent(QPaintEvent *event)
 //    if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_distance.toImageDy() );
 //    if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_distance.toImageD() );
 
+    painter.setPen( QPen( QBrush( Qt::darkRed ), 2.0f ) );
     this->_cubicCurve.draw( painter );
 
+    painter.setPen( QPen( QBrush( Qt::darkGreen ), 1.0f ) );
+    painter.drawPolyline( this->_cubicCurve.polyline() );
 }
 
 void DrawArea::resizeEvent(QResizeEvent *event)
