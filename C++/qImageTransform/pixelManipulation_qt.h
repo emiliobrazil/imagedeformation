@@ -17,7 +17,7 @@
 #include <vector>
 
 typedef Wendland31<real,2> kernel;
-typedef DivLinearMLSVF<real,2,kernel> vector_field;
+typedef LinearMLSVF<real,2,kernel> vector_field;
 
 
 enum interpolationKernel{ HAAR, BILINEAR, CUBIC };

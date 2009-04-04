@@ -5,7 +5,7 @@
 #define _MAX_ERRO_ 1
 #define _MAX_ITERATION_ 10
 #define _N_SAMPLES_ 50
-#define _CORNER_ANGLE_ (60/180)*PI
+#define _CORNER_ANGLE_ (60.0/180.0)*PI
 
 CubicCurveFitter::CubicCurveFitter( void )
 {
@@ -112,10 +112,13 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
 bool CubicCurveFitter::_isCorner( QPointF p )
 {
     if( this->_segment.getC3() == this->_segment.getC2() ) return false;
+        std::cerr << "CubicCurveFitter::_isCorner 01" << std::endl;
+
     QPointF tan = this->_segment.tanC3();
     QPointF pTest = p - this->_segment.getC3();
     pTest /= sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
     real theta = acos(tan.x()*pTest.x() + tan.y()*pTest.y()) ;
+            std::cerr << "CubicCurveFitter::_isCorner 02 -- theta = " << theta << " " << _CORNER_ANGLE_ << std::endl;
     return ( theta > _CORNER_ANGLE_ );
 }
 
