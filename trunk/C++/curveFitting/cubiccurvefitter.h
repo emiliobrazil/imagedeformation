@@ -22,9 +22,10 @@ public:
     void initialize( uint32 w , uint32 h , uint32 radius );
 
     void addPoint( QPointF p );
-    void draw( QPainter &painter );
+    void draw( QPainter &painter , bool drawTan = false );
     CurvePath& curve( void );
     QPolygonF& polyline( void ){ return this->_poliline;}
+    QPolygonF& corner( void ){ return this->_corners;}
 
     DistanceField& field( void ){ return this->_field; }
 
@@ -41,6 +42,7 @@ private:
     CurvePath _path;
     CubicSegment _segment;
     QPolygonF _poliline;
+    QPolygonF _corners;
     QPointF _continun;
     bool _G1;
     bool _NewPath;

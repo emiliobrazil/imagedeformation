@@ -32,6 +32,10 @@ private:
     bool _showDistanceFieldDx;
     bool _showDistanceFieldDy;
     bool _showDistanceFieldD;
+    bool _showTan;
+    bool _showPolyline;
+    bool _showCurve;
+    bool _showCorner;
 
     CubicCurveFitter _cubicCurve;
 };

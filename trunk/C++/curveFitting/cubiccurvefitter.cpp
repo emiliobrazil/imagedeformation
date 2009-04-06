@@ -2,9 +2,9 @@
 #include <math.h>
 #include <primitive_const.h>
 
-#define _TOL_ERRO_ 3.0*1e-1
-#define _MAX_ITERATION_ 70
-#define _N_SAMPLES_ 300
+#define _TOL_ERRO_ 5.0*1e-1
+#define _MAX_ITERATION_ 50
+#define _N_SAMPLES_ 200
 #define _CORNER_ANGLE_ (60.0/180.0)*PI
 
 CubicCurveFitter::CubicCurveFitter( void )
@@ -56,17 +56,18 @@ void CubicCurveFitter::clear( void )
     this->_field.clear() ;
     this->_path.clear() ;
     this->_poliline.clear() ;
+    this->_corners.clear() ;
     this->_segment.set( QPointF( 0 ,0 ) , QPointF( 0 ,0 ) , QPointF( 0 ,0 ) , QPointF( 0 ,0 ) );
     this->_G1         = false;
     this->_NewPath    = true;
 }
 
-void CubicCurveFitter::draw( QPainter &painter )
+void CubicCurveFitter::draw( QPainter &painter ,  bool drawTan )
 {
-    painter.setPen( QPen( QBrush( Qt::darkBlue ), 4.0f ) );
-    this->_path.draw(painter);
-    painter.setPen( QPen( QBrush( Qt::red ), 4.0f ) );
-    this->_segment.draw(painter);
+    painter.setPen( QPen( QBrush( Qt::darkBlue ), 2.0f ) );
+    this->_path.draw( painter , drawTan);
+    painter.setPen( QPen( QBrush( Qt::red ), 2.0f ) );
+    this->_segment.draw( painter, drawTan);
 }
 
 CurvePath& CubicCurveFitter::curve( void )
@@ -98,12 +99,16 @@ void CubicCurveFitter::addPoint( QPointF p )
         
         this->_field.clear();
         
-        this->_segment.set( preview , p , preview , p );
+        this->_segment.set( preview , preview , p , p );
 
         this->_field.putPoint( preview );
         this->_field.putLine( preview , p );
 
-        if( rslt == CORNER ) this->_G1 = false ;
+        if( rslt == CORNER )
+        {
+            this->_G1 = false ;
+            this->_corners.push_back(preview);
+        }
         else this->_G1 = true ;
     }
 }
@@ -149,11 +154,6 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
         f1*= ( 6.0*delta );
         f2*= ( 6.0*delta );
 
-        if( f1.x() > 1e4 || f1.y() > 1e4 || f2.x() > 1e4 || f2.y() > 1e4 )
-        {
-            std::cerr << "CubicCurveFitter::_update 04a CO " << f1.x() << " -- " << f1.y() << " ++ " << f2.x() << " -- " << f2.y()  << std::endl;
-        }
-
         if(this->_G1)
         {
             QPointF tan = this->_path.tanC3last();
@@ -164,22 +164,10 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
                 f1 = tan * ( ( tan.x()*f1.x() + tan.y()*f1.y() ) );
             }
         }
-
-//        std::cerr << "CubicCurveFitter::_update 04a CO " << this->_segment.getC0().x() << " -- " << this->_segment.getC0().y() <<
-//                " // C1 " << this->_segment.getC1().x() << " -- " << this->_segment.getC1().y() <<
-//                " // C2 " << this->_segment.getC2().x() << " -- " << this->_segment.getC2().y() <<
-//                " // C3 " << this->_segment.getC3().x() << " -- " << this->_segment.getC3().y() << " ++ error =  " << error << std::endl;
-
         this->_segment.setC1( this->_segment.getC1() + f1 );
         this->_segment.setC2( this->_segment.getC2() + f2 );
 
         error = this->_erro();
-
-//        std::cerr << "CubicCurveFitter::_update 04b CO " << this->_segment.getC0().x() << " -- " << this->_segment.getC0().y() <<
-//                " // C1 " << this->_segment.getC1().x() << " -- " << this->_segment.getC1().y() <<
-//                " // C2 " << this->_segment.getC2().x() << " -- " << this->_segment.getC2().y() <<
-//                " // C3 " << this->_segment.getC3().x() << " -- " << this->_segment.getC3().y() << " ++ error =  " << error << std::endl;
-
         ++nInteration;
     }
 

@@ -31,19 +31,22 @@ void CubicSegment::set( QPointF C0 , QPointF C1 , QPointF C2 , QPointF C3 )
     this->_C[3] = C3 ;
 }
 
-void CubicSegment::draw( QPainter &painter )
+void CubicSegment::draw( QPainter &painter , bool drawTan )
 {
     QPainterPath path;
 
     path.moveTo( this->_C[0] );
     path.cubicTo( this->_C[1] , this->_C[2] , this->_C[3]);
-
     painter.drawPath(path);
-    QPen oldPen = painter.pen();
-    painter.setPen( QPen( QBrush( Qt::black ), 1.0f ) );
-    painter.drawLine(this->_C[0],this->_C[1]);
-    painter.drawLine(this->_C[3],this->_C[2]);
+
+    if(drawTan)
+    {
+        QPen oldPen = painter.pen();
+        painter.setPen( QPen( QBrush( Qt::black ), 1.0f ) );
+        painter.drawLine(this->_C[0],this->_C[1]);
+        painter.drawLine(this->_C[3],this->_C[2]);
         painter.setPen( oldPen );
+    }
 
 }
 

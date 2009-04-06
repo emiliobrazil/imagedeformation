@@ -24,9 +24,14 @@ DrawArea::DrawArea(QWidget *parent)
     this->_showDistanceFieldDx = false ;
     this->_showDistanceFieldDy = false ;
     this->_showDistanceFieldD = false ;
+    this->_showTan = false;
+    this->_showPolyline = false;
+    this->_showCurve = true;
+    this->_showCorner = false;
 
-    void addPoint( QPointF p );
-    void draw( QPainter &painter );
+    setBackgroundRole(QPalette::Base);
+    setAutoFillBackground(true);
+
 
 }
 
@@ -58,17 +63,31 @@ void DrawArea::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-//    painter.drawImage( 0 , 0 , this->_image) ;
+    painter.setBackground(QBrush( Qt::white ));
+
+    painter.setBackgroundMode( Qt::OpaqueMode );
+    //    painter.drawImage( 0 , 0 , this->_image) ;
 
     if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageRGBTest() );
     if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageDx() );
     if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageDy() );
     if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageD() );
 
-    this->_cubicCurve.draw( painter );
+    if( this->_showCurve )this->_cubicCurve.draw( painter , this->_showTan );
 
     painter.setPen( QPen( QBrush( Qt::darkGreen ), 1.0f ) );
-    painter.drawPolyline( this->_cubicCurve.polyline() );
+    if( this->_showPolyline ) painter.drawPolyline( this->_cubicCurve.polyline() );
+
+    if( this->_showCorner )
+    {
+        painter.setPen( QPen( QBrush( Qt::green ), 4.0f ) );
+        QPolygonF tmp = this->_cubicCurve.corner();
+        for ( uint32 i=0 ; i < (uint32)tmp.size() ; ++i )
+        {
+            painter.drawPoint( tmp[i] );
+        }
+    }
+
 }
 
 void DrawArea::resizeEvent(QResizeEvent *event)
@@ -88,6 +107,18 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
     case Qt::Key_S:
         this->_showDistanceFieldRGB = !this->_showDistanceFieldRGB;
         break;
+    case Qt::Key_T:
+        this->_showTan = !this->_showTan;
+        break;
+    case Qt::Key_O:
+        this->_showCurve = !this->_showCurve;
+        break;
+    case Qt::Key_I:
+        this->_showCorner = !this->_showCorner;
+        break;
+    case Qt::Key_P:
+        this->_showPolyline = !this->_showPolyline;
+        break;
     case Qt::Key_X:
         this->_showDistanceFieldDx = !this->_showDistanceFieldDx ;
         break;
@@ -100,7 +131,7 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
     case Qt::Key_C:
         //        this->_image = QImage( 1024, 780 ,QImage::Format_ARGB32 );
         this->_cubicCurve.clear();
-        this->_distance.clear();
+//        this->_distance.clear();
         break;
     default:
         QWidget::keyPressEvent ( event );
