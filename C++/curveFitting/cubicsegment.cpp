@@ -50,8 +50,8 @@ void CubicSegment::draw( QPainter &painter )
 QPointF CubicSegment::tanC3( void )
 {
     QPointF tan = this->getC2() - this->getC3() ;
-    tan /= sqrt( tan.x()*tan.x() + tan.y()*tan.y() );
-    return tan;
+    real norm = sqrt( tan.x()*tan.x() + tan.y()*tan.y() );
+    return 3.0*tan;
 }
 
 CubicSegment& CubicSegment::operator=(const CubicSegment& segment) {

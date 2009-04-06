@@ -52,21 +52,25 @@ real DistanceField::dx( real x , real y )
     real valueTmp , value = 0 ;
 
     valueTmp = this->dx( x1 , y1 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x1) ;
     tmpH = this->_kBilinear(y-y1) ;
     value += valueTmp*(tmpV*tmpH) ;
 
     valueTmp = this->dx( x1 , y2 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x1) ;
     tmpH = this->_kBilinear(y-y2) ;
     value += valueTmp*(tmpV*tmpH) ;
 
     valueTmp = this->dx( x2 , y1 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x2) ;
     tmpH = this->_kBilinear(y-y1) ;
     value += valueTmp*(tmpV*tmpH) ;
 
     valueTmp = this->dx( x2 , y2 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x2) ;
     tmpH = this->_kBilinear(y-y2) ;
     value += valueTmp*(tmpV*tmpH) ;
@@ -83,21 +87,25 @@ real DistanceField::dy( real x , real y )
     real valueTmp , value = 0 ;
 
     valueTmp = this->dy( x1 , y1 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x1) ;
     tmpH = this->_kBilinear(y-y1) ;
     value += valueTmp*(tmpV*tmpH) ;
 
     valueTmp = this->dy( x1 , y2 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x1) ;
     tmpH = this->_kBilinear(y-y2) ;
     value += valueTmp*(tmpV*tmpH) ;
 
     valueTmp = this->dy( x2 , y1 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x2) ;
     tmpH = this->_kBilinear(y-y1) ;
     value += valueTmp*(tmpV*tmpH) ;
 
     valueTmp = this->dy( x2 , y2 );
+    if( valueTmp == INF_LOCAL ) return INF_LOCAL;
     tmpV = this->_kBilinear(x-x2) ;
     tmpH = this->_kBilinear(y-y2) ;
     value += valueTmp*(tmpV*tmpH) ;
