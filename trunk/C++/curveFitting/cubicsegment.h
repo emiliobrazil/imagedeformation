@@ -11,30 +11,34 @@ class CubicSegment
 public:
     CubicSegment( void );
     CubicSegment( QPointF C0 , QPointF C1 , QPointF C2 , QPointF C3 );
+    CubicSegment( const CubicSegment &segment );
+    ~CubicSegment( void ){}
+
+    CubicSegment& operator=( const CubicSegment &segment );
 
     void set( QPointF C0 , QPointF C1 , QPointF C2 , QPointF C3 );
 
-    void setC0( QPointF C0 ){ this->_C0 = C0 ;}
-    void setC1( QPointF C1 ){ this->_C1 = C1 ;}
-    void setC2( QPointF C2 ){ this->_C2 = C2 ;}
-    void setC3( QPointF C3 ){ this->_C0 = C3 ;}
+    void setC0( QPointF C0 ){ this->_C[0] = C0 ;}
+    void setC1( QPointF C1 ){ this->_C[1] = C1 ;}
+    void setC2( QPointF C2 ){ this->_C[2] = C2 ;}
+    void setC3( QPointF C3 ){ this->_C[3] = C3 ;}
 
-    inline QPointF eval( real t ){ return this->_C0*( (1.0-t)*(1.0-t)*(1.0-t) ) +
-                                          this->_C1*(   3.0*t*(1.0-t)*(1.0-t) ) +
-                                          this->_C2*(   3.0*t*   t   *(1.0-t) ) +
-                                          this->_C3*(    t   *   t   *   t    ) ;}
+    inline QPointF eval( real t ){ return this->_C[0]*( (1.0-t)*(1.0-t)*(1.0-t) ) +
+                                          this->_C[1]*(   3.0*t*(1.0-t)*(1.0-t) ) +
+                                          this->_C[2]*(   3.0*t*   t   *(1.0-t) ) +
+                                          this->_C[3]*(    t   *   t   *   t    ) ;}
 
-    QPointF getC0( void ){ return this->_C0 ;}
-    QPointF getC1( void ){ return this->_C1 ;}
-    QPointF getC2( void ){ return this->_C2 ;}
-    QPointF getC3( void ){ return this->_C3 ;}
+    QPointF getC0( void ) const { return this->_C[0] ;}
+    QPointF getC1( void ) const { return this->_C[1] ;}
+    QPointF getC2( void ) const { return this->_C[2] ;}
+    QPointF getC3( void ) const { return this->_C[3] ;}
 
     void draw( QPainter &painter );
 
     QPointF tanC3( void );
 
 private:
-    QPointF _C0 , _C1 , _C2 , _C3;
+    QPointF _C[4];
 
 };
 

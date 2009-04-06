@@ -12,6 +12,12 @@ class CubicCurveFitter
 public:
     CubicCurveFitter( void );
     CubicCurveFitter( uint32 w , uint32 h , uint32 radius );
+    CubicCurveFitter( const CubicSegment &segment );
+    ~CubicCurveFitter( void ){}
+
+    CubicCurveFitter& operator=( const CubicCurveFitter &curve );
+
+    void clear( void );
 
     void initialize( uint32 w , uint32 h , uint32 radius );
 
@@ -19,6 +25,8 @@ public:
     void draw( QPainter &painter );
     CurvePath& curve( void );
     QPolygonF& polyline( void ){ return this->_poliline;}
+
+    DistanceField& field( void ){ return this->_field; }
 
 protected:
     enum RESULT{ CORNER , SUCCESS , FAILURE , } ;
@@ -35,8 +43,7 @@ private:
     QPolygonF _poliline;
     QPointF _continun;
     bool _G1;
-    bool _NewSegment;
-
+    bool _NewPath;
 };
 
 #endif // CUBICCURVEFITTER_H
