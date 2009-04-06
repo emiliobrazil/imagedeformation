@@ -15,16 +15,30 @@ class DistanceField
 public:
     DistanceField( void ){  }
     DistanceField( uint32 w , uint32 h , uint32 radius );
+    DistanceField(const DistanceField &field);
     ~DistanceField( void ){}
 
+    DistanceField &operator=(const DistanceField &field);
     void initialize( uint32 w , uint32 h , uint32 radius );
 
-    inline real dx( int i , int j ){ return this->_dx[ this->_index( i , j ) ];}
-    inline real dy( int i , int j ){ return this->_dy[ this->_index( i , j ) ];}
+    inline real dx( int i , int j ){
+        uint32 index = this->_index( i , j );
+        if( index > this->_numberOfElements ) return INF ;
+        return this->_dx[ index ];
+    }
+    inline real dy( int i , int j ){
+        uint32 index = this->_index( i , j );
+        if( index > this->_numberOfElements ) return INF ;
+        return this->_dy[ index ];
+    }
+
     real dx( real x , real y ) ;
     real dy( real x , real y ) ;
 
-    inline QPointF dxdy( QPointF p ){ return QPointF( dx( (real)p.x() , (real)p.y() ) , dy( (real)p.x() , (real)p.y() ) ); }
+    real dx( QPointF p ){ return this->dx( (real)p.x() , (real)p.y() );}
+    real dy( QPointF p ){ return this->dy( (real)p.x() , (real)p.y() );}
+
+    inline QPointF dxdy( QPointF p ){ return QPointF( dx( p ) , dy( p ) ); }
 
     void putLine( QPointF a , QPointF b ) ;
     void putPoint( QPointF a ) ;

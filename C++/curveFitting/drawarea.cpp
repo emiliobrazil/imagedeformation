@@ -60,12 +60,11 @@ void DrawArea::paintEvent(QPaintEvent *event)
 
 //    painter.drawImage( 0 , 0 , this->_image) ;
 
-//    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_distance.toImageRGBTest() );
-//    if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_distance.toImageDx() );
-//    if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_distance.toImageDy() );
-//    if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_distance.toImageD() );
+    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageRGBTest() );
+    if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageDx() );
+    if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageDy() );
+    if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageD() );
 
-    painter.setPen( QPen( QBrush( Qt::darkRed ), 2.0f ) );
     this->_cubicCurve.draw( painter );
 
     painter.setPen( QPen( QBrush( Qt::darkGreen ), 1.0f ) );
@@ -100,6 +99,7 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
         break;
     case Qt::Key_C:
         //        this->_image = QImage( 1024, 780 ,QImage::Format_ARGB32 );
+        this->_cubicCurve.clear();
         this->_distance.clear();
         break;
     default:
