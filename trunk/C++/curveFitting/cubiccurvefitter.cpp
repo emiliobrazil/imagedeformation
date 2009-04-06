@@ -127,13 +127,18 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
         QPointF f1( 0 , 0 ) , f2( 0 , 0 ) ;
         real delta = 1.0/(real)_N_SAMPLES_;
 
+        real t ;
+        QPointF Bti ;
+        real di ;
+
         for( uint32 i = 1 ; i < _N_SAMPLES_ ;++i )
         {
-            real t = (real)i*delta;
-            QPointF Bti = this->_field.dxdy( this->_segment.eval( t ) ) ;
-            real di = ( Bti.x()*Bti.x() + Bti.y()*Bti.y() );
+            t = (real)i*delta;
+            Bti = this->_field.dxdy( this->_segment.eval( t ) ) ;
+            di = sqrt( Bti.x()*Bti.x() + Bti.y()*Bti.y() );
             if( Bti.x() < 0.1*INF )
             {
+                if( di > 1e1 ) std::cerr << di << std::endl;
                 f1 += (t*(1.0-t)*(1.0-t)*di)*Bti;
                 f2 += (t*  t    *(1.0-t)*di)*Bti;
             }
@@ -141,15 +146,15 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
         f1*= ( 6.0*delta );
         f2*= ( 6.0*delta );
 
-        if( f1.x() > 1e3 || f1.y() > 1e3 || f2.x() > 1e3 || f2.y() > 1e3 )
+        if( f1.x() > 1e4 || f1.y() > 1e4 || f2.x() > 1e4 || f2.y() > 1e4 )
         {
             std::cerr << "CubicCurveFitter::_update 04a CO " << f1.x() << " -- " << f1.y() << " ++ " << f2.x() << " -- " << f2.y()  << std::endl;
         }
 
         if(this->_G1)
         {
-            QPointF tan = this->_path.tanC3last();
-            f1 = tan * ( ( tan.x()*f1.x() + tan.y()*f1.y() ) );
+//            QPointF tan = this->_path.tanC3last();
+//            f1 = tan * ( ( tan.x()*f1.x() + tan.y()*f1.y() ) );
         }
 
 //        std::cerr << "CubicCurveFitter::_update 04a CO " << this->_segment.getC0().x() << " -- " << this->_segment.getC0().y() <<
