@@ -33,7 +33,7 @@ public:
     QPointF getC2( void ) const { return this->_C[2] ;}
     QPointF getC3( void ) const { return this->_C[3] ;}
 
-    void draw( QPainter &painter );
+    void draw( QPainter &painter , bool drawTan = false );
 
     QPointF tanC3( void );
 
