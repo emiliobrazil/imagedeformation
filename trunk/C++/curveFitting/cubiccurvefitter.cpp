@@ -2,9 +2,9 @@
 #include <math.h>
 #include <primitive_const.h>
 
-#define _TOL_ERRO_ 8.0*1e-1
-#define _MAX_ITERATION_ 50
-#define _N_SAMPLES_ 200
+#define _TOL_ERRO_ 3.0*1e-1
+#define _MAX_ITERATION_ 70
+#define _N_SAMPLES_ 300
 #define _CORNER_ANGLE_ (60.0/180.0)*PI
 
 CubicCurveFitter::CubicCurveFitter( void )
@@ -98,12 +98,13 @@ void CubicCurveFitter::addPoint( QPointF p )
         
         this->_field.clear();
         
-        this->_segment.set( preview , preview , preview , preview );
+        this->_segment.set( preview , p , preview , p );
+
+        this->_field.putPoint( preview );
+        this->_field.putLine( preview , p );
 
         if( rslt == CORNER ) this->_G1 = false ;
         else this->_G1 = true ;
-        rslt = this->_update( p ) ;
-                            std::cerr << "CubicCurveFitter::addPoint 00 rslt " << rslt << std::endl;
     }
 }
 
@@ -136,9 +137,11 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
             t = (real)i*delta;
             Bti = this->_field.dxdy( this->_segment.eval( t ) ) ;
             di = sqrt( Bti.x()*Bti.x() + Bti.y()*Bti.y() );
-            if( Bti.x() < 0.1*INF )
+            if( Bti.x() < INF )
             {
-                if( di > 1e1 ) std::cerr << di << std::endl;
+                if( di > 1e3 ){
+                    std::cerr << di << std::endl;
+                }
                 f1 += (t*(1.0-t)*(1.0-t)*di)*Bti;
                 f2 += (t*  t    *(1.0-t)*di)*Bti;
             }
@@ -153,8 +156,13 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
 
         if(this->_G1)
         {
-//            QPointF tan = this->_path.tanC3last();
-//            f1 = tan * ( ( tan.x()*f1.x() + tan.y()*f1.y() ) );
+            QPointF tan = this->_path.tanC3last();
+            real normT = sqrt( tan.x()*tan.x() + tan.y()*tan.y() ) ;
+            if( normT > eps )
+            {
+                tan /= normT;
+                f1 = tan * ( ( tan.x()*f1.x() + tan.y()*f1.y() ) );
+            }
         }
 
 //        std::cerr << "CubicCurveFitter::_update 04a CO " << this->_segment.getC0().x() << " -- " << this->_segment.getC0().y() <<
@@ -174,7 +182,6 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
 
         ++nInteration;
     }
-    std::cerr << "CubicCurveFitter::_update 03b error " << error << " -- int " << nInteration << std::endl;
 
     if ( error < _TOL_ERRO_ )
     {
@@ -188,15 +195,23 @@ bool CubicCurveFitter::_isCorner( QPointF p )
 {
     if( this->_segment.getC3() == this->_segment.getC2() ) return false;
 
-    return false;
-
     QPointF tan = this->_segment.tanC3();
     QPointF pTest = p - this->_segment.getC3();
-    pTest /= sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
+    real normP = sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
+    real normT = sqrt( tan.x()*tan.x() + tan.y()*tan.y() ) ;
+    if( normP < eps || normT < eps )
+    {
+        return false;
+        std::cerr << "CubicCurveFitter::_isCorner" << normP  << " -- " << normT << std::endl;
+    }
+    pTest /= normP;
+    tan /= normT;
     real theta = acos(tan.x()*pTest.x() + tan.y()*pTest.y()) ;
-//            std::cerr << "CubicCurveFitter::_isCorner 02 --  theta > _CORNER_ANGLE_ = " << (theta > _CORNER_ANGLE_) << std::endl;
-    return ( theta > _CORNER_ANGLE_ );
+    return ( theta < _CORNER_ANGLE_ );
 }
+
+
+
 
 real CubicCurveFitter::_erro( void )
 {
