@@ -16,6 +16,8 @@ CubicCurveFitter::CubicCurveFitter( void )
     this->_continun   = QPointF() ;
     this->_G1         = false;
     this->_NewPath    = true;
+    this->_lostTan    = 0.0;
+    this->_totalTan   = 0.0;
 }
 
 CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius )
@@ -23,6 +25,8 @@ CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius )
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
+    this->_lostTan    = 0.0;
+    this->_totalTan   = 0.0;
 }
 
 void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius )
@@ -30,6 +34,8 @@ void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius )
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
+    this->_lostTan    = 0.0;
+    this->_totalTan   = 0.0;
 }
 
 CubicCurveFitter::CubicCurveFitter( const CubicSegment &segment )
@@ -46,7 +52,8 @@ CubicCurveFitter& CubicCurveFitter::operator=( const CubicCurveFitter &curve )
     this->_continun   =curve._continun ;
     this->_G1         =curve._G1 ;
     this->_NewPath    =curve._NewPath ;
-
+    this->_lostTan    = 0.0;
+    this->_totalTan   = 0.0;
     return (*this) ;
 }
 
@@ -99,7 +106,7 @@ void CubicCurveFitter::addPoint( QPointF p )
         
         this->_field.clear();
         
-        this->_segment.set( preview , preview , p , p );
+        this->_segment.set( preview , preview , p ,  p );
 
         this->_field.putPoint( preview );
         this->_field.putLine( preview , p );
@@ -181,20 +188,23 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
 
 bool CubicCurveFitter::_isCorner( QPointF p )
 {
-    if( this->_segment.getC3() == this->_segment.getC2() ) return false;
+//    if( this->_segment.getC3() == this->_segment.getC2() ) return false;
 
     QPointF tan = this->_segment.tanC3();
     QPointF pTest = p - this->_segment.getC3();
+
     real normP = sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
     real normT = sqrt( tan.x()*tan.x() + tan.y()*tan.y() ) ;
     if( normP < eps || normT < eps )
     {
-        return false;
         std::cerr << "CubicCurveFitter::_isCorner" << normP  << " -- " << normT << std::endl;
+        return false;
     }
     pTest /= normP;
     tan /= normT;
     real theta = acos(tan.x()*pTest.x() + tan.y()*pTest.y()) ;
+            std::cerr << "CubicCurveFitter::_isCorner theta = " << theta  << " _CORNER_ANGLE_ = " << _CORNER_ANGLE_ << std::endl;
+
     return ( theta < _CORNER_ANGLE_ );
 }
 

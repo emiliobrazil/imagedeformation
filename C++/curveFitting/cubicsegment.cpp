@@ -53,7 +53,6 @@ void CubicSegment::draw( QPainter &painter , bool drawTan )
 QPointF CubicSegment::tanC3( void )
 {
     QPointF tan = this->getC2() - this->getC3() ;
-    real norm = sqrt( tan.x()*tan.x() + tan.y()*tan.y() );
     return 3.0*tan;
 }
 

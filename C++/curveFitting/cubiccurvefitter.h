@@ -46,6 +46,8 @@ private:
     QPointF _continun;
     bool _G1;
     bool _NewPath;
+
+    real _lostTan , _totalTan , _lostSanples ;
 };
 
 #endif // CUBICCURVEFITTER_H
