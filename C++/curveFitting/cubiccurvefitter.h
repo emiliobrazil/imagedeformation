@@ -27,6 +27,10 @@ public:
     QPolygonF& polyline( void ){ return this->_poliline;}
     QPolygonF& corner( void ){ return this->_corners;}
 
+    QPolygonF& vectorTan( void ){ return this->_Tan;}
+    QPolygonF& vectorTeste( void ){ return this->_Teste;}
+    QPolygonF& tanPoints( void ){ return this->_TanPoints;}
+
     DistanceField& field( void ){ return this->_field; }
 
 protected:
@@ -43,11 +47,12 @@ private:
     CubicSegment _segment;
     QPolygonF _poliline;
     QPolygonF _corners;
-    QPointF _continun;
+    QPolygonF _Tan , _Teste , _TanPoints;
     bool _G1;
     bool _NewPath;
 
     real _lostTan , _totalTan , _lostSanples ;
+
 };
 
 #endif // CUBICCURVEFITTER_H
