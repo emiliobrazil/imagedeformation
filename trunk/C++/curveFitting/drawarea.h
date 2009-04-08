@@ -36,6 +36,9 @@ private:
     bool _showPolyline;
     bool _showCurve;
     bool _showCorner;
+    bool _showAngles;
+
+    real factor;
 
     CubicCurveFitter _cubicCurve;
 };

@@ -28,6 +28,9 @@ DrawArea::DrawArea(QWidget *parent)
     this->_showPolyline = false;
     this->_showCurve = true;
     this->_showCorner = false;
+    this->_showAngles = false;
+
+    this->factor = 1.0;
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -88,6 +91,23 @@ void DrawArea::paintEvent(QPaintEvent *event)
         }
     }
 
+    if( this->_showAngles )
+    {
+        QPolygonF Tan = this->_cubicCurve.vectorTan();
+        QPolygonF Teste = this->_cubicCurve.vectorTeste();
+        QPolygonF P = this->_cubicCurve.tanPoints();
+        if( P.size() != Tan.size() ) std::cerr << "DrawArea::paintEvent size Problem" << std::endl;
+        else{
+            for ( uint32 i=0 ; i < (uint32)Tan.size() ; ++i )
+            {
+                painter.setPen( QPen( QBrush( Qt::darkGreen ), 1.0f ) );
+                painter.drawLine( P[i], P[i] + this->factor*Tan[i] );
+
+                painter.setPen( QPen( QBrush( Qt::darkBlue ), 1.0f ) );
+                painter.drawLine( P[i], P[i] + this->factor*Teste[i] );
+            }
+        }
+    }
 }
 
 void DrawArea::resizeEvent(QResizeEvent *event)
@@ -104,8 +124,20 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
     case Qt::Key_Q:
         qApp->quit();
         break;
+    case Qt::Key_Minus:
+        this->factor*=.5;
+        break;
+    case Qt::Key_Plus:
+        this->factor*= 2.0 ;
+        break;
+    case Qt::Key_0:
+        this->factor=1.0;
+        break;
     case Qt::Key_S:
         this->_showDistanceFieldRGB = !this->_showDistanceFieldRGB;
+        break;
+    case Qt::Key_A:
+        this->_showAngles = !this->_showAngles;
         break;
     case Qt::Key_T:
         this->_showTan = !this->_showTan;

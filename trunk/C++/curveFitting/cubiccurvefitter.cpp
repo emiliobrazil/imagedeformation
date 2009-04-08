@@ -2,10 +2,12 @@
 #include <math.h>
 #include <primitive_const.h>
 
-#define _TOL_ERRO_ 5.0*1e-1
-#define _MAX_ITERATION_ 50
-#define _N_SAMPLES_ 200
-#define _CORNER_ANGLE_ (60.0/180.0)*PI
+#define TOL_ERRO 5.0*1e-1
+#define MAX_ITERATION 50
+#define N_SAMPLES 200
+//#define CORNER_ANGLE (30.0/180.0)*PI
+//--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
+#define CORNER_ANGLE 0.5
 
 CubicCurveFitter::CubicCurveFitter( void )
 {
@@ -13,7 +15,6 @@ CubicCurveFitter::CubicCurveFitter( void )
     this->_path       = CurvePath() ;
     this->_segment    = CubicSegment() ;
     this->_poliline   = QPolygonF() ;
-    this->_continun   = QPointF() ;
     this->_G1         = false;
     this->_NewPath    = true;
     this->_lostTan    = 0.0;
@@ -49,7 +50,6 @@ CubicCurveFitter& CubicCurveFitter::operator=( const CubicCurveFitter &curve )
     this->_path       =curve._path ;
     this->_segment    =curve._segment ;
     this->_poliline   =curve._poliline ;
-    this->_continun   =curve._continun ;
     this->_G1         =curve._G1 ;
     this->_NewPath    =curve._NewPath ;
     this->_lostTan    = 0.0;
@@ -64,6 +64,9 @@ void CubicCurveFitter::clear( void )
     this->_path.clear() ;
     this->_poliline.clear() ;
     this->_corners.clear() ;
+    this->_Tan.clear() ;
+    this->_Teste.clear() ;
+    this->_TanPoints.clear() ;
     this->_segment.set( QPointF( 0 ,0 ) , QPointF( 0 ,0 ) , QPointF( 0 ,0 ) , QPointF( 0 ,0 ) );
     this->_G1         = false;
     this->_NewPath    = true;
@@ -106,7 +109,7 @@ void CubicCurveFitter::addPoint( QPointF p )
         
         this->_field.clear();
         
-        this->_segment.set( preview , preview , p ,  p );
+        this->_segment.set( preview , p , preview ,  p );
 
         this->_field.putPoint( preview );
         this->_field.putLine( preview , p );
@@ -135,16 +138,16 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
     uint32 nInteration = 0;
     real error = this->_erro();
 
-    while ( ( error > _TOL_ERRO_ ) && ( nInteration < _MAX_ITERATION_ ) )
+    while ( ( error > TOL_ERRO ) && ( nInteration < MAX_ITERATION ) )
     {
         QPointF f1( 0 , 0 ) , f2( 0 , 0 ) ;
-        real delta = 1.0/(real)_N_SAMPLES_;
+        real delta = 1.0/(real)N_SAMPLES;
 
         real t ;
         QPointF Bti ;
         real di ;
 
-        for( uint32 i = 1 ; i < _N_SAMPLES_ ;++i )
+        for( uint32 i = 1 ; i < N_SAMPLES ;++i )
         {
             t = (real)i*delta;
             Bti = this->_field.dxdy( this->_segment.eval( t ) ) ;
@@ -178,7 +181,7 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
         ++nInteration;
     }
 
-    if ( error < _TOL_ERRO_ )
+    if ( error < TOL_ERRO )
     {
         return SUCCESS ;
     }
@@ -193,6 +196,10 @@ bool CubicCurveFitter::_isCorner( QPointF p )
     QPointF tan = this->_segment.tanC3();
     QPointF pTest = p - this->_segment.getC3();
 
+    this->_Tan.push_back(tan);
+    this->_Teste.push_back(pTest);
+    this->_TanPoints.push_back(p);
+
     real normP = sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
     real normT = sqrt( tan.x()*tan.x() + tan.y()*tan.y() ) ;
     if( normP < eps || normT < eps )
@@ -202,10 +209,13 @@ bool CubicCurveFitter::_isCorner( QPointF p )
     }
     pTest /= normP;
     tan /= normT;
-    real theta = acos(tan.x()*pTest.x() + tan.y()*pTest.y()) ;
-            std::cerr << "CubicCurveFitter::_isCorner theta = " << theta  << " _CORNER_ANGLE_ = " << _CORNER_ANGLE_ << std::endl;
 
-    return ( theta < _CORNER_ANGLE_ );
+
+    real dot = tan.x()*pTest.x() + tan.y()*pTest.y();
+
+    std::cerr << "CubicCurveFitter::_isCorner theta = " << dot  << " //  CORNER_ANGLE = " << CORNER_ANGLE << " is corner " << ( dot < CORNER_ANGLE ) << std::endl;
+
+    return ( dot < CORNER_ANGLE );
 }
 
 
@@ -214,10 +224,10 @@ bool CubicCurveFitter::_isCorner( QPointF p )
 real CubicCurveFitter::_erro( void )
 {
     real error = 0.0;
-    real delta = 1.0/_N_SAMPLES_;
+    real delta = 1.0/N_SAMPLES;
     real infLocal = INF*delta*0.5;
 
-    for( uint32 i = 1 ; i < _N_SAMPLES_ ;++i )
+    for( uint32 i = 1 ; i < N_SAMPLES ;++i )
         {
             real t = i*delta ;
             QPointF Bti = this->_segment.eval( t ) ;
@@ -227,6 +237,6 @@ real CubicCurveFitter::_erro( void )
             error += di;
 
         }
-               error/=(real)_N_SAMPLES_;
+               error/=(real)N_SAMPLES;
     return error ;
 }

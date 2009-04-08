@@ -52,11 +52,11 @@ void CubicSegment::draw( QPainter &painter , bool drawTan )
 
 QPointF CubicSegment::tanC3( void )
 {
-    QPointF tan = this->getC2() - this->getC3() ;
-    return 3.0*tan;
+    return 3.0 * ( this->getC2() - this->getC3() );
 }
 
-CubicSegment& CubicSegment::operator=(const CubicSegment& segment) {
+CubicSegment& CubicSegment::operator=(const CubicSegment& segment)
+{
     this->_C[0] = segment.getC0();
     this->_C[1] = segment.getC1();
     this->_C[2] = segment.getC2();
