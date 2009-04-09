@@ -18,6 +18,6 @@
   typedef double  fp64;
 
   typedef sint32   word;
-  typedef fp32     real;
+  typedef fp64     real;
 
 #endif  // __PRIMITIVE_TYPES_HPP__

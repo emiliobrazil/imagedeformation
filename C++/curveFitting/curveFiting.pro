@@ -18,5 +18,7 @@ HEADERS += mainwindow.h \
     distancefield.h \
     cubicsegment.h \
     curvepath.h \
-    cubiccurvefitter.h
-INCPATH += ../../bibliotecas/eVector/
+    cubiccurvefitter.h \
+    primitive_types.h \
+    primitive_const.h
+#INCPATH += ../../bibliotecas/eVector/

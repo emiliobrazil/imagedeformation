@@ -1,6 +1,6 @@
 #include "cubiccurvefitter.h"
 #include <math.h>
-#include <primitive_const.h>
+#include "primitive_const.h"
 
 #define TOL_ERRO 5.0*1e-1
 #define MAX_ITERATION 50
@@ -107,12 +107,12 @@ void CubicCurveFitter::addPoint( QPointF p )
         CubicSegment tmpSeg = this->_segment;
         this->_path.addSegment( tmpSeg ) ;
         
-        this->_field.clear();
-        
-        this->_segment.set( preview , p , preview ,  p );
-
-        this->_field.putPoint( preview );
-        this->_field.putLine( preview , p );
+//        this->_field.clear();
+//
+        this->_segment.set( preview , preview  , preview ,  preview );
+//
+//        this->_field.putPoint( preview );
+//        this->_field.putLine( preview , p );
 
         if( rslt == CORNER )
         {
@@ -120,12 +120,26 @@ void CubicCurveFitter::addPoint( QPointF p )
             this->_corners.push_back(preview);
         }
         else this->_G1 = true ;
+
+        CubicCurveFitter::RESULT rsltN = this->_update( p , false );
+        if( rsltN != SUCCESS )
+        {
+            std::cerr << "CubicCurveFitter::addPoint - rslt = " << rslt << "- rsltN = " << rsltN << std::endl;
+        }
+
     }
 }
 
-CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
+CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
 {
-    if( this->_isCorner( p ) ) return CORNER;
+    if( this->_isCorner( p ) )
+    {
+        if( !firstTry )
+        {
+            std::cerr << "CubicCurveFitter::_update -- CORNER" << std::endl;
+        }
+        return CORNER;
+    }
 
     CubicSegment previewSegment = this->_segment;
 
@@ -138,6 +152,9 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
     uint32 nInteration = 0;
     real error = this->_erro();
 
+    QPolygonF evalPointsVector;
+    QPolygonF evalVector;
+
     while ( ( error > TOL_ERRO ) && ( nInteration < MAX_ITERATION ) )
     {
         QPointF f1( 0 , 0 ) , f2( 0 , 0 ) ;
@@ -147,10 +164,18 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
         QPointF Bti ;
         real di ;
 
+        evalPointsVector.clear();
+        evalVector.clear();
+
         for( uint32 i = 1 ; i < N_SAMPLES ;++i )
         {
             t = (real)i*delta;
-            Bti = this->_field.dxdy( this->_segment.eval( t ) ) ;
+            QPointF evalPoint =  this->_segment.eval( t ) ;
+            Bti = this->_field.dxdy( evalPoint ) ;
+
+            evalVector.append( Bti );
+            evalPointsVector.append( evalPoint );
+
             di = sqrt( Bti.x()*Bti.x() + Bti.y()*Bti.y() );
             if( Bti.x() < INF )
             {
@@ -185,20 +210,23 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p )
     {
         return SUCCESS ;
     }
+//    if( !firstTry )
+    {
+        std::cerr << "CubicCurveFitter::_update - FAILURE " << std::endl;
+    }
     this->_segment = previewSegment ;
     return FAILURE;
 }
 
 bool CubicCurveFitter::_isCorner( QPointF p )
 {
-//    if( this->_segment.getC3() == this->_segment.getC2() ) return false;
+    if( this->_segment.getC3() == this->_segment.getC2() ) return false;
 
     QPointF tan = this->_segment.tanC3();
+    if(this->_poliline.size()-2 > 0 ) tan = p - this->_poliline[ this->_poliline.size()-2 ] ;
+
     QPointF pTest = p - this->_segment.getC3();
 
-    this->_Tan.push_back(tan);
-    this->_Teste.push_back(pTest);
-    this->_TanPoints.push_back(p);
 
     real normP = sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
     real normT = sqrt( tan.x()*tan.x() + tan.y()*tan.y() ) ;
@@ -210,10 +238,13 @@ bool CubicCurveFitter::_isCorner( QPointF p )
     pTest /= normP;
     tan /= normT;
 
+    this->_Tan.push_back(tan);
+    this->_Teste.push_back(pTest);
+    this->_TanPoints.push_back(this->_segment.getC3());
 
     real dot = tan.x()*pTest.x() + tan.y()*pTest.y();
 
-    std::cerr << "CubicCurveFitter::_isCorner theta = " << dot  << " //  CORNER_ANGLE = " << CORNER_ANGLE << " is corner " << ( dot < CORNER_ANGLE ) << std::endl;
+//    std::cerr << "CubicCurveFitter::_isCorner theta = " << dot  << " //  CORNER_ANGLE = " << CORNER_ANGLE << " is corner " << ( dot < CORNER_ANGLE ) << std::endl;
 
     return ( dot < CORNER_ANGLE );
 }

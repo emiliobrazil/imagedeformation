@@ -3,7 +3,7 @@
 
 #include <QPoint>
 #include <QPainter>
-#include <primitive_types.h>
+#include "primitive_types.h"
 
 
 class CubicSegment
