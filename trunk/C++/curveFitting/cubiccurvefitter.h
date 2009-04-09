@@ -36,7 +36,7 @@ public:
 protected:
     enum RESULT{ CORNER , SUCCESS , FAILURE , } ;
 
-    RESULT _update( QPointF p ) ;
+    RESULT _update( QPointF p , bool firstTry = true ) ;
     bool _isCorner( QPointF p ) ;
     real _erro( void ) ;
 
@@ -47,7 +47,7 @@ private:
     CubicSegment _segment;
     QPolygonF _poliline;
     QPolygonF _corners;
-    QPolygonF _Tan , _Teste , _TanPoints;
+    QPolygonF _Tan , _Teste , _TanPoints ;
     bool _G1;
     bool _NewPath;
 

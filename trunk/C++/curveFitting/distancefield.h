@@ -7,7 +7,7 @@
 #include <QImage>
 #include <vector>
 
-#include <primitive_types.h>
+#include "primitive_types.h"
 #include "primitive_const.h"
 
 class DistanceField

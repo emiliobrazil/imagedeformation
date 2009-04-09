@@ -42,9 +42,9 @@ void CubicSegment::draw( QPainter &painter , bool drawTan )
     if(drawTan)
     {
         QPen oldPen = painter.pen();
-        painter.setPen( QPen( QBrush( Qt::black ), 1.0f ) );
-        painter.drawLine(this->_C[0],this->_C[1]);
-        painter.drawLine(this->_C[3],this->_C[2]);
+        painter.setPen( QPen( QBrush( Qt::yellow ), 1.0f ) );
+        painter.drawLine(this->_C[0] , this->_C[1]);
+        painter.drawLine(this->_C[3] , this->_C[2]);
         painter.setPen( oldPen );
     }
 

@@ -91,6 +91,16 @@ void DrawArea::paintEvent(QPaintEvent *event)
         }
     }
 
+    if( this->_cubicCurve.polyline().size() == 4 )
+    {
+        painter.setPen( QPen( QBrush( Qt::darkRed ), 2.0f ) );
+
+        QPolygonF ct = this->_cubicCurve.polyline();
+        CubicSegment teste( ct[0] , ct[1] , ct[2] , ct[3] );
+        teste.draw(painter,this->_showTan);
+    }
+
+
     if( this->_showAngles )
     {
         QPolygonF Tan = this->_cubicCurve.vectorTan();
@@ -103,7 +113,7 @@ void DrawArea::paintEvent(QPaintEvent *event)
                 painter.setPen( QPen( QBrush( Qt::darkGreen ), 1.0f ) );
                 painter.drawLine( P[i], P[i] + this->factor*Tan[i] );
 
-                painter.setPen( QPen( QBrush( Qt::darkBlue ), 1.0f ) );
+                painter.setPen( QPen( QBrush( Qt::blue ), 1.0f ) );
                 painter.drawLine( P[i], P[i] + this->factor*Teste[i] );
             }
         }

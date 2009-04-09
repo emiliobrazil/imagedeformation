@@ -1,7 +1,7 @@
 #ifndef LINESCAN_H
 #define LINESCAN_H
 
-#include <primitive_types.h>
+#include "primitive_types.h"
 
 #include <QImage>
 
