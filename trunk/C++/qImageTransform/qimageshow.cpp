@@ -138,58 +138,59 @@ void qImageShow::_setField()
         radiusTMP = ( N > radiusTMP )? N : radiusTMP ;
     }
 
-    real alpha, beta ;
-
-    alpha =1.0f; beta = .25f;
-    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
-    {
-        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
-        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
-        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
-    }
-
-    alpha = 1.0f; beta = .50f;
-    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
-    {
-        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
-        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
-        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
-    }
-
-    alpha = 0.75f; beta = .75f;
-    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
-    {
-        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
-        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
-        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
-    }
-
-    alpha = 0.75f; beta = 1.0f;
-    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
-    {
-        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
-        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
-        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
-    }
-
-    alpha = 0.5f; beta = 1.5f;
-    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
-    {
-        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
-        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
-        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
-    }
-
-
-    alpha = 0.0f; beta = 2.5f;
-    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
-    {
-        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
-        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
-        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
-    }
+//    real alpha, beta ;
+//
+//    alpha =1.0f; beta = .25f;
+//    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+//    {
+//        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+//        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+//    }
+//
+//    alpha = 1.0f; beta = .50f;
+//    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+//    {
+//        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+//        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+//    }
+//
+//    alpha = 0.75f; beta = .75f;
+//    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+//    {
+//        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+//        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+//    }
+//
+//    alpha = 0.75f; beta = 1.0f;
+//    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+//    {
+//        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+//        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+//    }
+//
+//    alpha = 0.5f; beta = 1.5f;
+//    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+//    {
+//        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+//        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+//    }
+//
+//
+//    alpha = 0.0f; beta = 2.5f;
+//    for (uint32 i = 1 ; i < ( numberOfB - 1 ) ; ++i)
+//    {
+//        Vector2D p( this->_lineB.at(i).x(), this->_lineB.at(i).y() );
+//        Vector2D v(  this->_lineD.at(i).x() - this->_lineB.at(i).x() , this->_lineD.at(i+1).y() - this->_lineB.at(i).y() );
+//        this->_vectorSamples.push_back( std::pair<Vector2D,Vector2D> ( p+beta * v , alpha * v ) );
+//    }
 
     this->_MLSRadius = 2.0f*radiusTMP;
+    this->_MLSRadius = 128.0f;
 
     uint32 numberOfsamples = this->_vectorSamples.size() ;
 
@@ -205,7 +206,10 @@ void qImageShow::_setField()
         vectors[ 2*i+1 ] = this->_vectorSamples[i].second.y();
     }
 
-    this->_field.setSamples( numberOfsamples , points , vectors );
+    vector_field_fitter fitter;
+    fitter.setSamples( numberOfsamples , points , vectors );
+    fitter.setRadius( this->_MLSRadius );
+    fitter.fit(this->_field);
     delete[] vectors;
     delete[] points;
     fprintf(stderr, "Field Seted \n");
@@ -217,8 +221,6 @@ void qImageShow::_buildField( void )
 {
 
     fprintf(stderr, "Building Field ...\n");
-
-    this->_field.setRadius( this->_MLSRadius );
 
     QPolygonF poli( this->_lineC.toVector() );
     QRectF bBox = poli.boundingRect();

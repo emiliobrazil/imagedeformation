@@ -42,9 +42,9 @@ void CubicSegment::draw( QPainter &painter , bool drawTan )
     if(drawTan)
     {
         QPen oldPen = painter.pen();
-        painter.setPen( QPen( QBrush( Qt::yellow ), 1.0f ) );
-        painter.drawLine(this->_C[0] , this->_C[1]);
-        painter.drawLine(this->_C[3] , this->_C[2]);
+        painter.setPen( QPen( QBrush( Qt::darkYellow ), 1.0f ) );
+        painter.drawLine( this->_C[0] , this->_C[0] + this->tanC0() );
+        painter.drawLine( this->_C[3] , this->_C[3] + this->tanC3() );
         painter.setPen( oldPen );
     }
 
@@ -52,7 +52,12 @@ void CubicSegment::draw( QPainter &painter , bool drawTan )
 
 QPointF CubicSegment::tanC3( void )
 {
-    return 3.0 * ( this->getC2() - this->getC3() );
+    return 3.0 * ( this->getC3() - this->getC2() );
+}
+
+QPointF CubicSegment::tanC0( void )
+{
+    return 3.0 * ( this->getC1() - this->getC0() );
 }
 
 CubicSegment& CubicSegment::operator=(const CubicSegment& segment)

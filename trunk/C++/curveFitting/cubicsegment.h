@@ -36,6 +36,7 @@ public:
     void draw( QPainter &painter , bool drawTan = false );
 
     QPointF tanC3( void );
+    QPointF tanC0( void );
 
 private:
     QPointF _C[4];

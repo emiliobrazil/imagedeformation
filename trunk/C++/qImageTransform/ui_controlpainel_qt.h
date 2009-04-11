@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'controlpainel_qt.ui'
 **
-** Created: Thu Mar 19 19:02:10 2009
+** Created: Fri Apr 10 20:39:02 2009
 **      by: Qt User Interface Compiler version 4.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
