@@ -98,6 +98,14 @@ void DrawArea::paintEvent(QPaintEvent *event)
         QPolygonF ct = this->_cubicCurve.polyline();
         CubicSegment teste( ct[0] , ct[1] , ct[2] , ct[3] );
         teste.draw(painter,this->_showTan);
+
+        uint32 nopTest = 200;
+        painter.setPen( QPen( QBrush( Qt::red ), 1.0f ) );
+        for ( uint32 i=0 ; i < nopTest ; ++i )
+        {
+            real t = (real)i/(real)nopTest;
+            painter.drawPoint( teste.eval( t) );
+        }
     }
 
 

@@ -2,12 +2,29 @@
 #include <math.h>
 #include "primitive_const.h"
 
-#define TOL_ERRO 5.0*1e-1
-#define MAX_ITERATION 50
-#define N_SAMPLES 200
+#define TOL_ERRO 2.0*1e-1
+#define MAX_ITERATION 100
+#define N_SAMPLES 50
 //#define CORNER_ANGLE (30.0/180.0)*PI
 //--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
-#define CORNER_ANGLE 0.5
+#define CORNER_ANGLE 0.01
+
+inline real dot( QPointF P , QPointF Q )
+{
+    return ( P.x()*Q.x() + P.y()*Q.y() );
+}
+
+inline real normQuad( QPointF P )
+{
+    return dot( P , P);
+}
+
+inline real norm( QPointF P )
+{
+    return sqrt( normQuad( P ) );
+}
+
+
 
 CubicCurveFitter::CubicCurveFitter( void )
 {
@@ -92,6 +109,7 @@ void CubicCurveFitter::addPoint( QPointF p )
         this->_segment.set( p , p , p , p );
         this->_NewPath = false;
         this->_poliline.push_back( p );
+        this->_field.putPoint( p );
         return;
     }
 
@@ -107,12 +125,10 @@ void CubicCurveFitter::addPoint( QPointF p )
         CubicSegment tmpSeg = this->_segment;
         this->_path.addSegment( tmpSeg ) ;
         
-//        this->_field.clear();
-//
+        this->_field.clear();
+
+        this->_field.putPoint( preview );
         this->_segment.set( preview , preview  , preview ,  preview );
-//
-//        this->_field.putPoint( preview );
-//        this->_field.putLine( preview , p );
 
         if( rslt == CORNER )
         {
@@ -143,11 +159,19 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
 
     CubicSegment previewSegment = this->_segment;
 
+
     this->_segment.setC3( p );
     this->_segment.setC2( this->_segment.getC2() + ( p - previewSegment.getC3() ) );
 
-    this->_field.putPoint( previewSegment.getC3() );
+    this->_field.putPoint( p );
     this->_field.putLine( previewSegment.getC3() , p );
+
+    if( !firstTry )
+    {
+        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
+        this->_segment.setC1( median );
+        this->_segment.setC2( median );
+    }
 
     uint32 nInteration = 0;
     real error = this->_erro();
@@ -173,10 +197,10 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
             QPointF evalPoint =  this->_segment.eval( t ) ;
             Bti = this->_field.dxdy( evalPoint ) ;
 
-            evalVector.append( Bti );
-            evalPointsVector.append( evalPoint );
+            evalVector.push_back( Bti );
+            evalPointsVector.push_back( evalPoint );
 
-            di = sqrt( Bti.x()*Bti.x() + Bti.y()*Bti.y() );
+            di = norm(Bti);
             if( Bti.x() < INF )
             {
                 if( di > 1e3 ){
@@ -189,19 +213,25 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
         f1*= ( 6.0*delta );
         f2*= ( 6.0*delta );
 
-        if(this->_G1)
-        {
-            QPointF tan = this->_path.tanC3last();
-            real normT = sqrt( tan.x()*tan.x() + tan.y()*tan.y() ) ;
-            if( normT > eps )
-            {
-                tan /= normT;
-                f1 = tan * ( ( tan.x()*f1.x() + tan.y()*f1.y() ) );
-            }
-        }
         this->_segment.setC1( this->_segment.getC1() + f1 );
         this->_segment.setC2( this->_segment.getC2() + f2 );
 
+        if(this->_G1)
+        {
+            QPointF tan = this->_path.tanC3last();
+            QPointF P = this->_segment.tanC0();
+            real normT = norm( tan ) ;
+            if( normT > eps )
+            {
+                tan /= normT;
+                P = tan * abs( dot( tan , P ) );
+                this->_segment.setC1( ( P/3.0 ) + this->_segment.getC0() ) ;
+            }
+            else
+            {
+                std::cerr << "CubicCurveFitter::_update - normT < eps " << std::endl;
+            }
+        }
         error = this->_erro();
         ++nInteration;
     }
@@ -210,10 +240,7 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     {
         return SUCCESS ;
     }
-//    if( !firstTry )
-    {
-        std::cerr << "CubicCurveFitter::_update - FAILURE " << std::endl;
-    }
+
     this->_segment = previewSegment ;
     return FAILURE;
 }
@@ -223,16 +250,15 @@ bool CubicCurveFitter::_isCorner( QPointF p )
     if( this->_segment.getC3() == this->_segment.getC2() ) return false;
 
     QPointF tan = this->_segment.tanC3();
-    if(this->_poliline.size()-2 > 0 ) tan = p - this->_poliline[ this->_poliline.size()-2 ] ;
 
     QPointF pTest = p - this->_segment.getC3();
 
 
-    real normP = sqrt( pTest.x()*pTest.x() + pTest.y()*pTest.y() ) ;
-    real normT = sqrt( tan.x()*tan.x() + tan.y()*tan.y() ) ;
+    real normP = norm( pTest ) ;
+    real normT = norm( tan ) ;
     if( normP < eps || normT < eps )
     {
-        std::cerr << "CubicCurveFitter::_isCorner" << normP  << " -- " << normT << std::endl;
+        std::cerr << "CubicCurveFitter::_isCorner " << normP  << " -- " << normT << std::endl;
         return false;
     }
     pTest /= normP;
@@ -242,14 +268,12 @@ bool CubicCurveFitter::_isCorner( QPointF p )
     this->_Teste.push_back(pTest);
     this->_TanPoints.push_back(this->_segment.getC3());
 
-    real dot = tan.x()*pTest.x() + tan.y()*pTest.y();
+    real dotTP = dot( tan , pTest );
 
 //    std::cerr << "CubicCurveFitter::_isCorner theta = " << dot  << " //  CORNER_ANGLE = " << CORNER_ANGLE << " is corner " << ( dot < CORNER_ANGLE ) << std::endl;
 
-    return ( dot < CORNER_ANGLE );
+    return ( dotTP < CORNER_ANGLE );
 }
-
-
 
 
 real CubicCurveFitter::_erro( void )
@@ -259,15 +283,14 @@ real CubicCurveFitter::_erro( void )
     real infLocal = INF*delta*0.5;
 
     for( uint32 i = 1 ; i < N_SAMPLES ;++i )
-        {
-            real t = i*delta ;
-            QPointF Bti = this->_segment.eval( t ) ;
+    {
+        real t = i*delta ;
+        QPointF Bti = this->_segment.eval( t ) ;
 
-            real dix = this->_field.dx( Bti ), diy = this->_field.dy( Bti) , di = infLocal ;
-            if(  dix < INF ) di = dix*dix + diy*diy;
-            error += di;
-
-        }
-               error/=(real)N_SAMPLES;
+        real dix = this->_field.dx( Bti ), diy = this->_field.dy( Bti) , di ;
+        di = (  dix < INF )? dix*dix + diy*diy : infLocal ;
+        error += di;
+    }
+    error/=(real)N_SAMPLES;
     return error ;
 }

@@ -7,7 +7,8 @@
 #include <Vector2D.h>
 #include "qMyLine.h"
 
-#include <mlsvf.hpp>
+//#include <mlsvf.hpp>
+#include <sda.hpp>
 
 #include <QPainter>
 #include <QImage>
@@ -16,9 +17,12 @@
 
 #include <vector>
 
-typedef Wendland31<real,2> kernel;
-typedef LinearMLSVF<real,2,kernel> vector_field;
-
+//typedef Wendland31<real,2> kernel;
+//typedef LinearMLSVF<real,2,kernel> vector_field;
+//typedef sda::Wendland31RBF<real,2> RBF;
+typedef sda::GaussianRBF<real,2> RBF;
+typedef sda::RBFVectorField<real,2,RBF> vector_field;
+typedef sda::RBFVectorFieldFitter<real,2,RBF> vector_field_fitter;
 
 enum interpolationKernel{ HAAR, BILINEAR, CUBIC };
 
