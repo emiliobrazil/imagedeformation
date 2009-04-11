@@ -47,12 +47,10 @@ private:
     CubicSegment _segment;
     QPolygonF _poliline;
     QPolygonF _corners;
-    QPolygonF _Tan , _Teste , _TanPoints ;
+    QPointF  _tmpTan , _tmpTeste , _tmpTanPoints  ;
+    QPolygonF  _Tan , _Teste , _TanPoints ;
     bool _G1;
     bool _NewPath;
-
-    real _lostTan , _totalTan , _lostSanples ;
-
 };
 
 #endif // CUBICCURVEFITTER_H
