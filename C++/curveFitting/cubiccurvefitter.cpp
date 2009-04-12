@@ -2,12 +2,12 @@
 #include <math.h>
 #include "primitive_const.h"
 
-#define TOL_ERRO 2.0*1e-1
+#define TOL_ERRO 1.0
 #define MAX_ITERATION 100
-#define N_SAMPLES 50
+#define N_SAMPLES 20
 //#define CORNER_ANGLE (30.0/180.0)*PI
 //--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
-#define CORNER_ANGLE 0.01
+#define CORNER_ANGLE 0.1
 
 inline real dot( QPointF P , QPointF Q )
 {
@@ -34,8 +34,6 @@ CubicCurveFitter::CubicCurveFitter( void )
     this->_poliline   = QPolygonF() ;
     this->_G1         = false;
     this->_NewPath    = true;
-    this->_lostTan    = 0.0;
-    this->_totalTan   = 0.0;
 }
 
 CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius )
@@ -43,8 +41,6 @@ CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius )
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
-    this->_lostTan    = 0.0;
-    this->_totalTan   = 0.0;
 }
 
 void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius )
@@ -52,8 +48,6 @@ void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius )
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
-    this->_lostTan    = 0.0;
-    this->_totalTan   = 0.0;
 }
 
 CubicCurveFitter::CubicCurveFitter( const CubicSegment &segment )
@@ -69,8 +63,6 @@ CubicCurveFitter& CubicCurveFitter::operator=( const CubicCurveFitter &curve )
     this->_poliline   =curve._poliline ;
     this->_G1         =curve._G1 ;
     this->_NewPath    =curve._NewPath ;
-    this->_lostTan    = 0.0;
-    this->_totalTan   = 0.0;
     return (*this) ;
 }
 
@@ -133,9 +125,13 @@ void CubicCurveFitter::addPoint( QPointF p )
         if( rslt == CORNER )
         {
             this->_G1 = false ;
-            this->_corners.push_back(preview);
+            this->_corners.push_back(p);
         }
         else this->_G1 = true ;
+
+        this->_Tan.push_back(this->_tmpTan);
+        this->_Teste.push_back(this->_tmpTanPoints);
+        this->_TanPoints.push_back(this->_tmpTeste);
 
         CubicCurveFitter::RESULT rsltN = this->_update( p , false );
         if( rsltN != SUCCESS )
@@ -176,9 +172,6 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     uint32 nInteration = 0;
     real error = this->_erro();
 
-    QPolygonF evalPointsVector;
-    QPolygonF evalVector;
-
     while ( ( error > TOL_ERRO ) && ( nInteration < MAX_ITERATION ) )
     {
         QPointF f1( 0 , 0 ) , f2( 0 , 0 ) ;
@@ -188,24 +181,15 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
         QPointF Bti ;
         real di ;
 
-        evalPointsVector.clear();
-        evalVector.clear();
-
         for( uint32 i = 1 ; i < N_SAMPLES ;++i )
         {
             t = (real)i*delta;
             QPointF evalPoint =  this->_segment.eval( t ) ;
             Bti = this->_field.dxdy( evalPoint ) ;
 
-            evalVector.push_back( Bti );
-            evalPointsVector.push_back( evalPoint );
-
             di = norm(Bti);
             if( Bti.x() < INF )
             {
-                if( di > 1e3 ){
-                    std::cerr << di << std::endl;
-                }
                 f1 += (t*(1.0-t)*(1.0-t)*di)*Bti;
                 f2 += (t*  t    *(1.0-t)*di)*Bti;
             }
@@ -240,7 +224,6 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     {
         return SUCCESS ;
     }
-
     this->_segment = previewSegment ;
     return FAILURE;
 }
@@ -264,13 +247,11 @@ bool CubicCurveFitter::_isCorner( QPointF p )
     pTest /= normP;
     tan /= normT;
 
-    this->_Tan.push_back(tan);
-    this->_Teste.push_back(pTest);
-    this->_TanPoints.push_back(this->_segment.getC3());
+    this->_tmpTan = tan;
+    this->_tmpTanPoints = pTest;
+    this->_tmpTeste = p;
 
     real dotTP = dot( tan , pTest );
-
-//    std::cerr << "CubicCurveFitter::_isCorner theta = " << dot  << " //  CORNER_ANGLE = " << CORNER_ANGLE << " is corner " << ( dot < CORNER_ANGLE ) << std::endl;
 
     return ( dotTP < CORNER_ANGLE );
 }
