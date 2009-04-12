@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-TARGET = qImageTransform
+TARGET = mlsImageTransform
 
 QT += core \
     gui \
@@ -23,7 +23,6 @@ FORMS += controlpainel_qt.ui
 
 INCPATH += ../../bibliotecas/eVector/ \
            ../../bibliotecas/vector_field/ \
-           ../../bibliotecas/sda/include
 
 LIBS += -L../../bibliotecas/eVector/ -L/usr/lib/atlas \
         -leVector -llapack -latlas
