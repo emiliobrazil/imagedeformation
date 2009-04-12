@@ -146,10 +146,6 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
 {
     if( this->_isCorner( p ) )
     {
-        if( !firstTry )
-        {
-            std::cerr << "CubicCurveFitter::_update -- CORNER" << std::endl;
-        }
         return CORNER;
     }
 
