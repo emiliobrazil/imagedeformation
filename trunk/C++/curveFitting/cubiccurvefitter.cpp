@@ -125,7 +125,7 @@ void CubicCurveFitter::addPoint( QPointF p )
         if( rslt == CORNER )
         {
             this->_G1 = false ;
-            this->_corners.push_back(p);
+            this->_corners.push_back(preview);
         }
         else this->_G1 = true ;
 
@@ -158,12 +158,12 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     this->_field.putPoint( p );
     this->_field.putLine( previewSegment.getC3() , p );
 
-    if( !firstTry )
-    {
-        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
-        this->_segment.setC1( median );
-        this->_segment.setC2( median );
-    }
+//    if( !firstTry )
+//    {
+//        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
+//        this->_segment.setC1( median );
+//        this->_segment.setC2( median );
+//    }
 
     uint32 nInteration = 0;
     real error = this->_erro();
@@ -245,7 +245,7 @@ bool CubicCurveFitter::_isCorner( QPointF p )
 
     this->_tmpTan = tan;
     this->_tmpTanPoints = pTest;
-    this->_tmpTeste = p;
+    this->_tmpTeste = this->_segment.getC3();
 
     real dotTP = dot( tan , pTest );
 
