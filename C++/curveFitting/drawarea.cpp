@@ -83,7 +83,7 @@ void DrawArea::paintEvent(QPaintEvent *event)
 
     if( this->_showCorner )
     {
-        painter.setPen( QPen( QBrush( Qt::green ), 4.0f ) );
+        painter.setPen( QPen( QBrush( Qt::magenta ), 6.0f ) );
         QPolygonF tmp = this->_cubicCurve.corner();
         for ( uint32 i=0 ; i < (uint32)tmp.size() ; ++i )
         {
@@ -118,11 +118,14 @@ void DrawArea::paintEvent(QPaintEvent *event)
         else{
             for ( uint32 i=0 ; i < (uint32)Tan.size() ; ++i )
             {
-                painter.setPen( QPen( QBrush( Qt::darkGreen ), 1.0f ) );
+                painter.setPen( QPen( QBrush( Qt::green ), 1.0f ) );
                 painter.drawLine( P[i], P[i] + this->factor*Tan[i] );
 
                 painter.setPen( QPen( QBrush( Qt::blue ), 1.0f ) );
                 painter.drawLine( P[i], P[i] + this->factor*Teste[i] );
+
+                painter.setPen( QPen( QBrush( Qt::red), 4.0f ) );
+                painter.drawPoint(P[i]);
             }
         }
     }
