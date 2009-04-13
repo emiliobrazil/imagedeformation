@@ -2,9 +2,9 @@
 #include <math.h>
 #include "primitive_const.h"
 
-#define TOL_ERRO 1.0
-#define MAX_ITERATION 100
-#define N_SAMPLES 20
+#define TOL_ERRO 2.0
+#define MAX_ITERATION 70
+#define N_SAMPLES 50
 //#define CORNER_ANGLE (30.0/180.0)*PI
 //--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
 #define CORNER_ANGLE 0.1
@@ -150,7 +150,6 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     }
 
     CubicSegment previewSegment = this->_segment;
-
 
     this->_segment.setC3( p );
     this->_segment.setC2( this->_segment.getC2() + ( p - previewSegment.getC3() ) );
