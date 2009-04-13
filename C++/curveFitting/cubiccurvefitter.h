@@ -24,6 +24,7 @@ public:
     void addPoint( QPointF p );
     void draw( QPainter &painter , bool drawTan = false );
     CurvePath& curve( void );
+    void finish(void);
     QPolygonF& polyline( void ){ return this->_poliline;}
     QPolygonF& corner( void ){ return this->_corners;}
 
