@@ -28,6 +28,8 @@ private:
     DistanceField _distance;
     uint32 _radius;
 
+    QVector<CurvePath> _paths;
+
     bool _showDistanceFieldRGB;
     bool _showDistanceFieldDx;
     bool _showDistanceFieldDy;

@@ -99,7 +99,7 @@ void DrawArea::paintEvent(QPaintEvent *event)
         CubicSegment teste( ct[0] , ct[1] , ct[2] , ct[3] );
         teste.draw(painter,this->_showTan);
 
-        uint32 nopTest = 200;
+        uint32 nopTest = 20;
         painter.setPen( QPen( QBrush( Qt::red ), 1.0f ) );
         for ( uint32 i=0 ; i < nopTest ; ++i )
         {
