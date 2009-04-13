@@ -38,6 +38,14 @@ DrawArea::DrawArea(QWidget *parent)
 
 }
 
+void DrawArea::mouseReleaseEvent(QMouseEvent *event)
+{
+    if( event->button() == Qt::LeftButton )
+    {
+        this->_cubicCurve.finish();
+    }
+}
+
 void DrawArea::mousePressEvent(QMouseEvent *event)
 {
     if(  event->buttons() == Qt::LeftButton )

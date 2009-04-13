@@ -2,12 +2,12 @@
 #include <math.h>
 #include "primitive_const.h"
 
-#define TOL_ERRO 2.0
+#define TOL_ERRO 6.0
 #define MAX_ITERATION 70
-#define N_SAMPLES 50
+#define N_SAMPLES 30
 //#define CORNER_ANGLE (30.0/180.0)*PI
 //--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
-#define CORNER_ANGLE 0.1
+#define CORNER_ANGLE 0.5
 
 inline real dot( QPointF P , QPointF Q )
 {
@@ -91,7 +91,15 @@ void CubicCurveFitter::draw( QPainter &painter ,  bool drawTan )
 
 CurvePath& CubicCurveFitter::curve( void )
 {
+    this->_path.addSegment(this->_segment);
+    this->_NewPath = true;
     return this->_path;
+}
+
+void CubicCurveFitter::finish( void )
+{
+    this->_path.addSegment(this->_segment);
+    this->_NewPath = true;
 }
 
 void CubicCurveFitter::addPoint( QPointF p )
@@ -101,6 +109,7 @@ void CubicCurveFitter::addPoint( QPointF p )
         this->_segment.set( p , p , p , p );
         this->_NewPath = false;
         this->_poliline.push_back( p );
+        this->_field.clear();
         this->_field.putPoint( p );
         return;
     }
@@ -157,12 +166,12 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     this->_field.putPoint( p );
     this->_field.putLine( previewSegment.getC3() , p );
 
-//    if( !firstTry )
-//    {
-//        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
-//        this->_segment.setC1( median );
-//        this->_segment.setC2( median );
-//    }
+    if( !firstTry )
+    {
+        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
+        this->_segment.setC1( median );
+        this->_segment.setC2( median );
+    }
 
     uint32 nInteration = 0;
     real error = this->_erro();

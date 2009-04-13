@@ -18,6 +18,7 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     void keyPressEvent ( QKeyEvent * event );
@@ -29,6 +30,7 @@ private:
     uint32 _radius;
 
     QVector<CurvePath> _paths;
+    CubicCurveFitter _cubicCurve;
 
     bool _showDistanceFieldRGB;
     bool _showDistanceFieldDx;
@@ -42,7 +44,6 @@ private:
 
     real factor;
 
-    CubicCurveFitter _cubicCurve;
 };
 
 
