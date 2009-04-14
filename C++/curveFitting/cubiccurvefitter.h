@@ -11,7 +11,7 @@ class CubicCurveFitter
 {
 public:
     CubicCurveFitter( void );
-    CubicCurveFitter( uint32 w , uint32 h , uint32 radius );
+    CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro = 3.0  );
     CubicCurveFitter( const CubicSegment &segment );
     ~CubicCurveFitter( void ){}
 
@@ -19,7 +19,7 @@ public:
 
     void clear( void );
 
-    void initialize( uint32 w , uint32 h , uint32 radius );
+    void initialize( uint32 w , uint32 h , uint32 radius , real erro = 3.0 );
 
     void addPoint( QPointF p );
     void draw( QPainter &painter , bool drawTan = false );
@@ -31,6 +31,9 @@ public:
     QPolygonF& vectorTan( void ){ return this->_Tan;}
     QPolygonF& vectorTeste( void ){ return this->_Teste;}
     QPolygonF& tanPoints( void ){ return this->_TanPoints;}
+
+    void setErro( real erro ){ this->_erroTol = erro ;}
+    real getErro( void ){ return this->_erroTol ;}
 
     DistanceField& field( void ){ return this->_field; }
 
@@ -46,6 +49,8 @@ private:
     DistanceField _field;
     CurvePath _path;
     CubicSegment _segment;
+    real _erroTol;
+
     QPolygonF _poliline;
     QPolygonF _corners;
     QPointF  _tmpTan , _tmpTeste , _tmpTanPoints  ;

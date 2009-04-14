@@ -30,6 +30,7 @@ DrawArea::DrawArea(QWidget *parent)
     this->_showCorner = false;
     this->_showAngles = false;
 
+    this->_erroTol = 3.0;
     this->factor = 1.0;
 
     setBackgroundRole(QPalette::Base);
@@ -158,6 +159,16 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
         break;
     case Qt::Key_Plus:
         this->factor*= 2.0 ;
+        break;
+    case Qt::Key_Down:
+        this->_erroTol-=.5;
+        this->_cubicCurve.setErro(this->_erroTol);
+        std::cerr << "ERROR TOL = " << this->_cubicCurve.getErro( ) << std::endl;
+        break;
+    case Qt::Key_Up:
+        this->_erroTol+=.5;
+        this->_cubicCurve.setErro(this->_erroTol);
+        std::cerr << "ERROR TOL = " << this->_cubicCurve.getErro( ) << std::endl;
         break;
     case Qt::Key_0:
         this->factor=1.0;
