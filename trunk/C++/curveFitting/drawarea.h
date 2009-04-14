@@ -31,6 +31,8 @@ private:
 
     QVector<CurvePath> _paths;
     CubicCurveFitter _cubicCurve;
+    real _erroTol;
+
 
     bool _showDistanceFieldRGB;
     bool _showDistanceFieldDx;

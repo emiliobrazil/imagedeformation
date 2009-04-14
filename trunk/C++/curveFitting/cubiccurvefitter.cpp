@@ -2,12 +2,11 @@
 #include <math.h>
 #include "primitive_const.h"
 
-#define TOL_ERRO 6.0
-#define MAX_ITERATION 70
+#define MAX_ITERATION 20
 #define N_SAMPLES 30
 //#define CORNER_ANGLE (30.0/180.0)*PI
 //--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
-#define CORNER_ANGLE 0.5
+#define CORNER_ANGLE 0.0
 
 inline real dot( QPointF P , QPointF Q )
 {
@@ -34,20 +33,23 @@ CubicCurveFitter::CubicCurveFitter( void )
     this->_poliline   = QPolygonF() ;
     this->_G1         = false;
     this->_NewPath    = true;
+    this->_erroTol    = 3.0;
 }
 
-CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius )
+CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro  )
 {
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
+    this->_erroTol = erro;
 }
 
-void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius )
+void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius , real erro )
 {
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
+    this->_erroTol = erro;
 }
 
 CubicCurveFitter::CubicCurveFitter( const CubicSegment &segment )
@@ -63,6 +65,7 @@ CubicCurveFitter& CubicCurveFitter::operator=( const CubicCurveFitter &curve )
     this->_poliline   =curve._poliline ;
     this->_G1         =curve._G1 ;
     this->_NewPath    =curve._NewPath ;
+    this->_erroTol    =curve._erroTol;
     return (*this) ;
 }
 
@@ -176,7 +179,7 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     uint32 nInteration = 0;
     real error = this->_erro();
 
-    while ( ( error > TOL_ERRO ) && ( nInteration < MAX_ITERATION ) )
+    while ( ( error > this->_erroTol ) && ( nInteration < MAX_ITERATION ) )
     {
         QPointF f1( 0 , 0 ) , f2( 0 , 0 ) ;
         real delta = 1.0/(real)N_SAMPLES;
@@ -220,11 +223,18 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
                 std::cerr << "CubicCurveFitter::_update - normT < eps " << std::endl;
             }
         }
+
+        QPointF P1;
+        if( normQuad( P1 ) < 1.0 )
+        {
+
+        }
+
         error = this->_erro();
         ++nInteration;
     }
 
-    if ( error < TOL_ERRO )
+    if ( error < this->_erroTol )
     {
         return SUCCESS ;
     }
