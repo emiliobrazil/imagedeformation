@@ -24,6 +24,7 @@ public slots:
 private slots:
 	void drawImage( void );
 	void loadImage(QString fileName);
+        void saveImage( QString fileName );
 
 private:
 

@@ -21,6 +21,8 @@ public:
     void clearLineA( void ){this->_lineA.clear(); update();}
     void clearLineB( void ){this->_lineB.clear(); update();}
 
+    QImage getImage( void );
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -37,7 +39,7 @@ protected:
     void _buildField( void );
 
 private:
-    QPixmap _image;
+    QImage _image;
 
     QPointF _lastPoint;
     qMyLine _lineA;
