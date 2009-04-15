@@ -11,7 +11,7 @@ class CubicCurveFitter
 {
 public:
     CubicCurveFitter( void );
-    CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro = 3.0  );
+    CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro = 4.0  );
     CubicCurveFitter( const CubicSegment &segment );
     ~CubicCurveFitter( void ){}
 
@@ -19,7 +19,7 @@ public:
 
     void clear( void );
 
-    void initialize( uint32 w , uint32 h , uint32 radius , real erro = 3.0 );
+    void initialize( uint32 w , uint32 h , uint32 radius , real erro = 4.0 );
 
     void addPoint( QPointF p );
     void draw( QPainter &painter , bool drawTan = false );

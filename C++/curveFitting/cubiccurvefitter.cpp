@@ -2,8 +2,8 @@
 #include <math.h>
 #include "primitive_const.h"
 
-#define MAX_ITERATION 20
-#define N_SAMPLES 30
+#define MAX_ITERATION 210
+#define N_SAMPLES 10
 //#define CORNER_ANGLE (30.0/180.0)*PI
 //--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
 #define CORNER_ANGLE 0.0
@@ -33,7 +33,7 @@ CubicCurveFitter::CubicCurveFitter( void )
     this->_poliline   = QPolygonF() ;
     this->_G1         = false;
     this->_NewPath    = true;
-    this->_erroTol    = 3.0;
+    this->_erroTol    = 4.0;
 }
 
 CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro  )
@@ -224,13 +224,19 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
             }
         }
 
-        QPointF P1;
-        if( normQuad( P1 ) < 1.0 )
+        QPointF P1 = this->_segment.tanC0();
+        if( normQuad( P1 ) < 9.0 )
         {
-
+            this->_segment.setC1( this->_segment.getC0() + 3*P1 );
+        }
+        QPointF P2 = this->_segment.tanC3();
+        if( normQuad( P2 ) < 9.0 )
+        {
+            this->_segment.setC2( this->_segment.getC0() - 3*P2 );
         }
 
         error = this->_erro();
+
         ++nInteration;
     }
 

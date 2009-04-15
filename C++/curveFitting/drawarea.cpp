@@ -87,7 +87,7 @@ void DrawArea::paintEvent(QPaintEvent *event)
 
     if( this->_showCurve )this->_cubicCurve.draw( painter , this->_showTan );
 
-    painter.setPen( QPen( QBrush( Qt::darkGreen ), 1.0f ) );
+    painter.setPen( QPen( QBrush( Qt::darkGreen ), 2.0f ) );
     if( this->_showPolyline ) painter.drawPolyline( this->_cubicCurve.polyline() );
 
     if( this->_showCorner )

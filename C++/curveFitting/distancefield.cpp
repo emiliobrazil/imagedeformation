@@ -32,7 +32,7 @@ void DistanceField::initialize( uint32 w , uint32 h , uint32 radius )
 }
 
 DistanceField &DistanceField::operator=(const DistanceField &field)
-                                       {
+{
     this->_dx = field._dx;
     this->_dy = field._dy;
     this->_w = field._w;
