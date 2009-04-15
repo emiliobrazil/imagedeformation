@@ -30,7 +30,7 @@ qImageShow::~qImageShow()
 
 void qImageShow::drawImage( const QImage& image )
 {
-        this->_image = QPixmap::fromImage( image ) ;
+        this->_image =  image ;
         this->_size = this->_image.size();
         this->resize( this->_image.size());
 	update();
@@ -72,7 +72,7 @@ void qImageShow::paintEvent( QPaintEvent *event )
 {
 	QPainter painter(this);
 
-        painter.drawPixmap( 0 , 0 , this->_image);
+        painter.drawImage( 0 , 0 , this->_image);
         this-> _drawMasks( painter );
         this->_drawLine( painter );
         this->_drawVectorField( painter );
@@ -292,7 +292,7 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
 //        this->_finalImage.setAlphaChannel( this->_maskF );
         this->_setField();
         this->_buildField();
-        transformImage( this->_image.toImage() , this->_finalImage , this->_vectorField );
+        transformImage( this->_image , this->_finalImage , this->_vectorField );
         break;
     case Qt::Key_M:
         this->_showMaskF = !this->_showMaskF;
@@ -327,6 +327,16 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
     }
     update();
 }
+
+
+QImage qImageShow::getImage( void )
+{
+    QImage iTmp = this->_image;
+    QPainter painterTMP( &iTmp );
+    painterTMP.drawImage( 0 , 0 , this->_finalImage ) ;
+    return iTmp;
+}
+
 
 
 void qImageShow::resizeEvent( QResizeEvent *event )

@@ -8,6 +8,7 @@ qImageTransform::qImageTransform(QWidget *parent) : QMainWindow(parent)
 {
     ControlPainel_qt *buttons = new ControlPainel_qt(this);
     connect(buttons, SIGNAL( pressOpen( QString ) ), this, SLOT( loadImage( QString ) ));
+    connect(buttons, SIGNAL( pressSave( QString ) ), this, SLOT( saveImage( QString ) ));
 
     connect(buttons,SIGNAL( sDrawLineA( void ) ) , this , SLOT(drawLineA( void ) ) );
     connect(buttons,SIGNAL( sDrawLineB( void ) ) , this , SLOT(drawLineB( void ) ) );
@@ -39,7 +40,7 @@ qImageTransform::~qImageTransform()
 
 void qImageTransform::drawImage( void )
 {
-	_imageWindow->drawImage(this->_image);
+        this->_imageWindow->drawImage(this->_image);
 }
 
 void qImageTransform::loadImage(QString fileName)
@@ -50,7 +51,7 @@ void qImageTransform::loadImage(QString fileName)
         if (image.isNull())
         {
             QMessageBox::information(this, tr("Image Viewer"),
-                                     tr("Cannot load %1.").arg(fileName));
+                                     tr("Can not load %1.").arg(fileName));
             return;
         }
     this->_image = image;
@@ -58,4 +59,24 @@ void qImageTransform::loadImage(QString fileName)
     }
 }
 
-
+void qImageTransform::saveImage(QString fileName)
+{
+    QImage iTmp = this->_imageWindow->getImage();
+    if (!fileName.isEmpty())
+    {
+        if( iTmp.isNull() )
+        {
+            QMessageBox::information(this, tr("Image Viewer"),
+                                     tr("Cannot Save %1.").arg(fileName));
+            return;
+        }
+        this->_image = iTmp;
+        drawImage( );
+        bool s = iTmp.save(fileName);
+        if( !s )
+        {
+            QMessageBox::information(this, tr("Image Viewer"),
+                                     tr("Cannot Save %1.").arg(fileName));
+        }
+    }
+}

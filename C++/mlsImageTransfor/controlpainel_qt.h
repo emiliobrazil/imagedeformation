@@ -12,7 +12,8 @@ public:
     ~ControlPainel_qt();
 
 signals:
-	void pressOpen( QString fileName );
+        void pressOpen( QString fileName );
+        void pressSave( QString fileName );
 
 	void sDrawLineA( void );
 	void sDrawLineB( void );
@@ -20,8 +21,9 @@ signals:
         void sClearLineB( void );
 
 private slots:
-	void open( void );
-	void drawLineA( void ) { emit sDrawLineA(); }
+        void open( void );
+        void save( void );
+        void drawLineA( void ) { emit sDrawLineA(); }
 	void drawLineB( void ) { emit sDrawLineB(); }
 	void clearLineA( void ) { emit sClearLineA() ; }
         void clearLineB( void ) { emit sClearLineB() ; }
