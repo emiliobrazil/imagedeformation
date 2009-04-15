@@ -33,7 +33,7 @@ CubicCurveFitter::CubicCurveFitter( void )
     this->_poliline   = QPolygonF() ;
     this->_G1         = false;
     this->_NewPath    = true;
-    this->_erroTol    = 4.0;
+    this->_erroTol    = 2.0;
 }
 
 CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro  )
