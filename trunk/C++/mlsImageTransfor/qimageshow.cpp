@@ -276,8 +276,8 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         break;
 
     case Qt::Key_D:
-        this->_lineA.lineFilter();
         this->_lineA.close();
+        this->_lineA.lineFilter();
         this->_lineB.lineFilter( 0.5 );
         this->_lineD = this->_lineA.split( this->_lineB.atBegin() , this->_lineB.atEnd() ) ;
         this->_lineB.insertPoint( this->_lineD.atBegin() , 0 );
