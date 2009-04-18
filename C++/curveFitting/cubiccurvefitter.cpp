@@ -169,12 +169,12 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     this->_field.putPoint( p );
     this->_field.putLine( previewSegment.getC3() , p );
 
-    if( !firstTry )
-    {
-        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
-        this->_segment.setC1( median );
-        this->_segment.setC2( median );
-    }
+//    if( !firstTry )
+//    {
+//        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
+//        this->_segment.setC1( median );
+//        this->_segment.setC2( median );
+//    }
 
     uint32 nInteration = 0;
     real error = this->_erro();
@@ -204,25 +204,43 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
         f1*= ( 6.0*delta );
         f2*= ( 6.0*delta );
 
-        this->_segment.setC1( this->_segment.getC1() + f1 );
+//        this->_segment.setC1( this->_segment.getC1() + f1 );
+//        this->_segment.setC2( this->_segment.getC2() + f2 );
+//
+//        if(this->_G1)
+//        {
+//            QPointF tan = this->_path.tanC3last();
+//            QPointF P = this->_segment.tanC0();
+//            real normT = norm( tan ) ;
+//            if( normT > eps )
+//            {
+//                tan /= normT;
+//                P = tan * abs( dot( tan , P ) );
+//                this->_segment.setC1( ( P/3.0 ) + this->_segment.getC0() ) ;
+//            }
+//            else
+//            {
+//                std::cerr << "CubicCurveFitter::_update - normT < eps " << std::endl;
+//            }
+//        }
+
         this->_segment.setC2( this->_segment.getC2() + f2 );
 
         if(this->_G1)
         {
             QPointF tan = this->_path.tanC3last();
-            QPointF P = this->_segment.tanC0();
             real normT = norm( tan ) ;
             if( normT > eps )
             {
                 tan /= normT;
-                P = tan * abs( dot( tan , P ) );
-                this->_segment.setC1( ( P/3.0 ) + this->_segment.getC0() ) ;
+                f1 = tan * abs( dot( tan , f1 ) );
             }
             else
             {
                 std::cerr << "CubicCurveFitter::_update - normT < eps " << std::endl;
             }
         }
+        this->_segment.setC1( this->_segment.getC1() + f1 );
 
         QPointF P1 = this->_segment.tanC0();
         if( normQuad( P1 ) < 9.0 )
