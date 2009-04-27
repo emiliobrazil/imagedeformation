@@ -11,7 +11,7 @@ class CubicCurveFitter
 {
 public:
     CubicCurveFitter( void );
-    CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro = 2.0  );
+    CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro = 2.0 , real cornerAngle = 0.5 );
     CubicCurveFitter( const CubicSegment &segment );
     ~CubicCurveFitter( void ){}
 
@@ -19,10 +19,10 @@ public:
 
     void clear( void );
 
-    void initialize( uint32 w , uint32 h , uint32 radius , real erro = 2.0 );
+    void initialize( uint32 w , uint32 h , uint32 radius , real erro = 2.0 , real cornerAngle = 0.5);
 
     void addPoint( QPointF p );
-    void draw( QPainter &painter , bool drawTan = false );
+    void draw( QPainter &painter , bool drawTan = false , bool drawPol = false );
     CurvePath& curve( void );
     void finish(void);
     QPolygonF& polyline( void ){ return this->_poliline;}
@@ -34,6 +34,8 @@ public:
 
     void setErro( real erro ){ this->_erroTol = erro ;}
     real getErro( void ){ return this->_erroTol ;}
+    void setCornerAngle( real cornerAngle ){ this->_cornerAngle = cornerAngle ;}
+    real getCornerAngle( void ){ return this->_cornerAngle ;}
 
     DistanceField& field( void ){ return this->_field; }
 
@@ -50,6 +52,9 @@ private:
     CurvePath _path;
     CubicSegment _segment;
     real _erroTol;
+    uint32 _radius;
+    real _cornerAngle;
+
 
     QPolygonF _poliline;
     QPolygonF _corners;

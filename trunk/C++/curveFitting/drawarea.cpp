@@ -1,5 +1,4 @@
 #include "drawarea.h"
-#include "lineScan.h"
 
 #include "distancefield.h"
 
@@ -25,12 +24,13 @@ DrawArea::DrawArea(QWidget *parent)
     this->_showDistanceFieldDy = false ;
     this->_showDistanceFieldD = false ;
     this->_showTan = false;
-    this->_showPolyline = false;
+    this->_showPol = false;
+    this->_showDataIn = false;
     this->_showCurve = true;
     this->_showCorner = false;
     this->_showAngles = false;
 
-    this->_erroTol = 3.0;
+    this->_erroTol = 1.0;
     this->factor = 1.0;
 
     setBackgroundRole(QPalette::Base);
@@ -44,6 +44,16 @@ void DrawArea::mouseReleaseEvent(QMouseEvent *event)
     if( event->button() == Qt::LeftButton )
     {
         this->_cubicCurve.finish();
+        this->_corner.push_back( this->_cubicCurve.corner()) ;
+        this->_polyline.push_back(this->_cubicCurve.polyline());
+        this->_path.push_back(this->_cubicCurve.curve());
+
+        this->_pTan.push_back( this->_cubicCurve.tanPoints());
+        this->_tan.push_back( this->_cubicCurve.vectorTan());
+        this->_vTeste.push_back( this->_cubicCurve.vectorTeste());
+
+        this->_cubicCurve.clear();
+        update();
     }
 }
 
@@ -71,70 +81,66 @@ void DrawArea::mouseMoveEvent(QMouseEvent *event)
     update();
 }
 
+
 void DrawArea::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    painter.setBackground(QBrush( Qt::white ));
-
-    painter.setBackgroundMode( Qt::OpaqueMode );
     //    painter.drawImage( 0 , 0 , this->_image) ;
 
-    if( this->_showDistanceFieldRGB ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageRGBTest() );
-    if( this->_showDistanceFieldDx ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageDx() );
-    if( this->_showDistanceFieldDy ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageDy() );
-    if( this->_showDistanceFieldD ) painter.drawImage(0, 0 , this->_cubicCurve.field().toImageD() );
+    if( this->_showDistanceFieldRGB ) painter.drawImage( 0 , 0 , this->_cubicCurve.field().toImageRGBTest() );
+    if( this->_showDistanceFieldDx ) painter.drawImage( 0 , 0 , this->_cubicCurve.field().toImageDx() );
+    if( this->_showDistanceFieldDy ) painter.drawImage( 0 , 0 , this->_cubicCurve.field().toImageDy() );
+    if( this->_showDistanceFieldD ) painter.drawImage( 0 , 0 , this->_cubicCurve.field().toImageD() );
 
-    if( this->_showCurve )this->_cubicCurve.draw( painter , this->_showTan );
 
-    painter.setPen( QPen( QBrush( Qt::darkGreen ), 2.0f ) );
-    if( this->_showPolyline ) painter.drawPolyline( this->_cubicCurve.polyline() );
+    this->_cubicCurve.draw( painter , this->_showTan , this->_showPol );
 
+    if( this->_showCurve )
+    {
+        painter.setPen( QPen( QBrush( Qt::darkCyan ), 4.0f ) );
+        for( int i = 0 ; i < this->_path.size() ; ++i )
+        {
+            this->_path[i].draw( painter , this->_showTan , this->_showPol );
+        }
+    }
+
+    if( this->_showDataIn )
+    {
+        painter.setPen( QPen( QBrush( Qt::black ), 4.0f ) );
+        for( int i = 0 ; i < this->_polyline.size() ; ++i )
+        {
+            painter.drawPoints( this->_polyline[i] );
+        }
+    }
     if( this->_showCorner )
     {
         painter.setPen( QPen( QBrush( Qt::magenta ), 6.0f ) );
-        QPolygonF tmp = this->_cubicCurve.corner();
-        for ( uint32 i=0 ; i < (uint32)tmp.size() ; ++i )
+        for ( int i = 0 ; i < this->_corner.size() ; ++i )
         {
-            painter.drawPoint( tmp[i] );
+            painter.drawPoints( this->_corner[i] );
         }
     }
-
-    if( this->_cubicCurve.polyline().size() == 4 )
-    {
-        painter.setPen( QPen( QBrush( Qt::darkRed ), 2.0f ) );
-
-        QPolygonF ct = this->_cubicCurve.polyline();
-        CubicSegment teste( ct[0] , ct[1] , ct[2] , ct[3] );
-        teste.draw(painter,this->_showTan);
-
-        uint32 nopTest = 20;
-        painter.setPen( QPen( QBrush( Qt::red ), 1.0f ) );
-        for ( uint32 i=0 ; i < nopTest ; ++i )
-        {
-            real t = (real)i/(real)nopTest;
-            painter.drawPoint( teste.eval( t) );
-        }
-    }
-
 
     if( this->_showAngles )
     {
-        QPolygonF Tan = this->_cubicCurve.vectorTan();
-        QPolygonF Teste = this->_cubicCurve.vectorTeste();
-        QPolygonF P = this->_cubicCurve.tanPoints();
-        if( P.size() != Tan.size() ) std::cerr << "DrawArea::paintEvent size Problem" << std::endl;
-        else{
-            for ( uint32 i=0 ; i < (uint32)Tan.size() ; ++i )
+        for ( int i = 0 ; i < this->_tan.size() ; ++i )
+        {
+            QPolygonF Tan = this->_tan[i];
+            QPolygonF Teste = this->_vTeste[i];
+            QPolygonF P = this->_pTan[i];
+
+            for ( int j = 0 ; j < Tan.size() ; ++j )
             {
+
                 painter.setPen( QPen( QBrush( Qt::green ), 1.0f ) );
-                painter.drawLine( P[i], P[i] + this->factor*Tan[i] );
+                painter.drawLine( P[j], P[j] + this->factor*Tan[j] );
 
                 painter.setPen( QPen( QBrush( Qt::blue ), 1.0f ) );
-                painter.drawLine( P[i], P[i] + this->factor*Teste[i] );
+                painter.drawLine( P[j], P[j] + this->factor*Teste[j] );
 
-                painter.setPen( QPen( QBrush( Qt::red), 4.0f ) );
-                painter.drawPoint(P[i]);
+                painter.setPen( QPen( QBrush( Qt::darkRed), 4.0f ) );
+                painter.drawPoint(P[j]);
             }
         }
     }
@@ -170,6 +176,18 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
         this->_cubicCurve.setErro(this->_erroTol);
         std::cerr << "ERROR TOL = " << this->_cubicCurve.getErro( ) << std::endl;
         break;
+    case Qt::Key_1:
+        this->_cubicCurve.setCornerAngle( 0.707106781); // 45 degre
+        std::cerr << "CORNER TOL = 45 deg" << std::endl;
+        break;
+    case Qt::Key_2:
+        this->_cubicCurve.setCornerAngle( 0.5); // 60 degre
+        std::cerr << "CORNER TOL = 60 deg" << std::endl;
+        break;
+    case Qt::Key_3:
+        this->_cubicCurve.setCornerAngle( 0.0 ); // 90 degre
+        std::cerr << "CORNER TOL = 90 deg" << std::endl;
+        break;
     case Qt::Key_0:
         this->factor=1.0;
         break;
@@ -182,6 +200,9 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
     case Qt::Key_T:
         this->_showTan = !this->_showTan;
         break;
+    case Qt::Key_R:
+        this->_showPol = !this->_showPol;
+        break;
     case Qt::Key_O:
         this->_showCurve = !this->_showCurve;
         break;
@@ -189,7 +210,7 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
         this->_showCorner = !this->_showCorner;
         break;
     case Qt::Key_P:
-        this->_showPolyline = !this->_showPolyline;
+        this->_showDataIn = !this->_showDataIn;
         break;
     case Qt::Key_X:
         this->_showDistanceFieldDx = !this->_showDistanceFieldDx ;
@@ -202,8 +223,13 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
         break;
     case Qt::Key_C:
         //        this->_image = QImage( 1024, 780 ,QImage::Format_ARGB32 );
-        this->_cubicCurve.clear();
-//        this->_distance.clear();
+        //        this->_distance.clear();
+        this->_path.clear();
+        this->_polyline.clear();
+        this->_corner.clear();
+        this->_tan.clear();
+        this->_pTan.clear();
+        this->_vTeste.clear();
         break;
     default:
         QWidget::keyPressEvent ( event );

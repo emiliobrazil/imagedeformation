@@ -6,14 +6,12 @@ TARGET = curveFiting
 TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
-    lineScan.cpp \
     drawarea.cpp \
     distancefield.cpp \
     cubicsegment.cpp \
     curvepath.cpp \
     cubiccurvefitter.cpp
 HEADERS += mainwindow.h \
-    lineScan.h \
     drawarea.h \
     distancefield.h \
     cubicsegment.h \
@@ -21,4 +19,3 @@ HEADERS += mainwindow.h \
     cubiccurvefitter.h \
     primitive_types.h \
     primitive_const.h
-#INCPATH += ../../bibliotecas/eVector/

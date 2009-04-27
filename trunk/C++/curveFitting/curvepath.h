@@ -18,7 +18,7 @@ public:
 
     void clear( void ) { this->_segment.clear(); }
 
-    void draw( QPainter &painter , bool drawTan = false);
+    void draw( QPainter &painter , bool drawTan = false , bool drawPol = false);
 
 private:
     std::vector<CubicSegment> _segment;
