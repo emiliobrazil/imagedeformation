@@ -3,11 +3,11 @@
 #include <math.h>
 
 
-void CurvePath::draw( QPainter &painter ,  bool drawTan )
+void CurvePath::draw( QPainter &painter ,  bool drawTan , bool drawPol )
 {
     for(uint32 i = 0 ; i < this->_segment.size() ; ++i)
     {
-        this->_segment[i].draw( painter , drawTan );
+        this->_segment[i].draw( painter , drawTan , drawPol );
     }
 }
 

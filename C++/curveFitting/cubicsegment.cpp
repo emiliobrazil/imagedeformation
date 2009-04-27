@@ -31,7 +31,7 @@ void CubicSegment::set( QPointF C0 , QPointF C1 , QPointF C2 , QPointF C3 )
     this->_C[3] = C3 ;
 }
 
-void CubicSegment::draw( QPainter &painter , bool drawTan )
+void CubicSegment::draw( QPainter &painter , bool drawTan , bool drawPol)
 {
     QPainterPath path;
 
@@ -39,12 +39,28 @@ void CubicSegment::draw( QPainter &painter , bool drawTan )
     path.cubicTo( this->_C[1] , this->_C[2] , this->_C[3]);
     painter.drawPath(path);
 
+    if(drawPol)
+    {
+        QPen oldPen = painter.pen();
+
+        painter.setPen( QPen( QBrush( Qt::green ), 2.0f ) );
+        QPolygonF tmp = this->toPolyline();
+        painter.drawPolyline( tmp );
+        painter.setPen( QPen( QBrush( Qt::darkGreen ), 5.0f ) );
+        painter.drawPoints( tmp ) ;
+
+        painter.setPen( oldPen );
+    }
+
     if(drawTan)
     {
         QPen oldPen = painter.pen();
+
+        painter.setPen( QPen( QBrush( Qt::yellow ), 2.0f ) );
+        painter.drawLine( this->_C[3] , this->_C[3] + this->tanC3()/3.0 );
         painter.setPen( QPen( QBrush( Qt::darkYellow ), 1.0f ) );
-        painter.drawLine( this->_C[0] , this->_C[0] + this->tanC0() );
-        painter.drawLine( this->_C[3] , this->_C[3] + this->tanC3() );
+        painter.drawLine( this->_C[0] , this->_C[0] + this->tanC0()/3.0 );
+
         painter.setPen( oldPen );
     }
 
@@ -68,4 +84,14 @@ CubicSegment& CubicSegment::operator=(const CubicSegment& segment)
     this->_C[3] = segment.getC3();
 
     return (*this);
+}
+
+QPolygonF CubicSegment::toPolyline( void )
+{
+    QPolygonF tmp ;
+    for( int i = 0 ; i < 4 ; ++i )
+    {
+        tmp.push_back( this->_C[i] );
+    }
+    return tmp;
 }

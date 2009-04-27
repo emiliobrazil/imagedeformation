@@ -89,6 +89,10 @@ void qImageShow::_drawLine( QPainter &painter )
         {
             painter.drawPoint( _lineA.points()[i] );
         }
+        for ( uint32 i=0 ; i < _lineD.pointCount() ; ++i )
+        {
+            painter.drawPoint( _lineD.points()[i] );
+        }
     }
     painter.setPen( QPen( QBrush( Qt::red ), 4.0f ) );
     if (this->_lineB.points()!=NULL && this->_lineB.pointCount()>0 && this->_showLineB )
@@ -289,7 +293,32 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         this->_showMaskF = false;
         this->_showImageFinal = true;
         this->_finalImage = QImage( this->_size , QImage::Format_ARGB32 );
-//        this->_finalImage.setAlphaChannel( this->_maskF );
+        //        this->_finalImage.setAlphaChannel( this->_maskF );
+        this->_setField();
+        this->_buildField();
+        transformImage( this->_image , this->_finalImage , this->_vectorField );
+        break;
+    case Qt::Key_L:
+        fileName = QFileDialog::getSaveFileName(this,tr("Export Lines"), QDir::currentPath()+"/lineNew.lin",tr("lines (*.lin)"));
+        if(!fileName.isEmpty())
+        {
+            this->_lineA.save(fileName);
+            this->_lineB.save(fileName);
+        }
+        this->_lineA.close();
+        this->_lineA.lineFilter();
+        this->_lineB.lineFilter( 0.5 );
+        this->_lineD = this->_lineA.split( this->_lineB.atBegin() , this->_lineB.atEnd() ) ;
+        this->_lineB.insertPoint( this->_lineD.atBegin() , 0 );
+        this->_lineB.insertPoint( this->_lineD.atEnd() );
+        this->_lineD.reparametri( this->_lineB );
+        this->_lineC = this->_lineA.join( this->_lineB );
+        this->_lineC.close();
+        this->_maskF = eBitMapMask( this->_image.size() , this->_lineC.toVector() );
+        this->_showMaskF = false;
+        this->_showImageFinal = true;
+        this->_finalImage = QImage( this->_size , QImage::Format_ARGB32 );
+        //        this->_finalImage.setAlphaChannel( this->_maskF );
         this->_setField();
         this->_buildField();
         transformImage( this->_image , this->_finalImage , this->_vectorField );

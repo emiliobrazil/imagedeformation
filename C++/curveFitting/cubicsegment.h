@@ -33,10 +33,12 @@ public:
     QPointF getC2( void ) const { return this->_C[2] ;}
     QPointF getC3( void ) const { return this->_C[3] ;}
 
-    void draw( QPainter &painter , bool drawTan = false );
+    void draw( QPainter &painter , bool drawTan = false , bool drawPol = false );
 
     QPointF tanC3( void );
     QPointF tanC0( void );
+
+    QPolygonF toPolyline( void );
 
 private:
     QPointF _C[4];

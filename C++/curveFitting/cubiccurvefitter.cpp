@@ -2,11 +2,11 @@
 #include <math.h>
 #include "primitive_const.h"
 
-#define MAX_ITERATION 210
-#define N_SAMPLES 10
+#define MAX_ITERATION 60
+#define N_SAMPLES 20
 //#define CORNER_ANGLE (30.0/180.0)*PI
 //--> Cos(60)=0.5 => ( A.dot.B < 0.5 <=> theta(A,B) > 60 )
-#define CORNER_ANGLE 0.0
+//#define CORNER_ANGLE 0.0
 
 inline real dot( QPointF P , QPointF Q )
 {
@@ -34,27 +34,32 @@ CubicCurveFitter::CubicCurveFitter( void )
     this->_G1         = false;
     this->_NewPath    = true;
     this->_erroTol    = 2.0;
+    this->_cornerAngle = 0.5;
 }
 
-CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro  )
+CubicCurveFitter::CubicCurveFitter( uint32 w , uint32 h , uint32 radius , real erro , real cornerAngle )
 {
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
     this->_erroTol = erro;
+    this->_radius = radius;
+    this->_cornerAngle = cornerAngle;
 }
 
-void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius , real erro )
+void CubicCurveFitter::initialize( uint32 w , uint32 h , uint32 radius , real erro , real cornerAngle )
 {
     this->_field.initialize(  w ,  h ,  radius );
     this->_G1 = false;
     this->_NewPath = true;
     this->_erroTol = erro;
+    this->_radius = radius;
+    this->_cornerAngle = cornerAngle;
 }
 
 CubicCurveFitter::CubicCurveFitter( const CubicSegment &segment )
 {
-        (*this) = segment;
+    (*this) = segment;
 }
 
 CubicCurveFitter& CubicCurveFitter::operator=( const CubicCurveFitter &curve )
@@ -66,6 +71,8 @@ CubicCurveFitter& CubicCurveFitter::operator=( const CubicCurveFitter &curve )
     this->_G1         =curve._G1 ;
     this->_NewPath    =curve._NewPath ;
     this->_erroTol    =curve._erroTol;
+    this->_radius     = curve._radius;
+    this->_cornerAngle = curve._cornerAngle;
     return (*this) ;
 }
 
@@ -84,12 +91,12 @@ void CubicCurveFitter::clear( void )
     this->_NewPath    = true;
 }
 
-void CubicCurveFitter::draw( QPainter &painter ,  bool drawTan )
+void CubicCurveFitter::draw( QPainter &painter ,  bool drawTan , bool drawPol)
 {
     painter.setPen( QPen( QBrush( Qt::darkBlue ), 2.0f ) );
-    this->_path.draw( painter , drawTan);
+    this->_path.draw( painter , drawTan , drawPol );
     painter.setPen( QPen( QBrush( Qt::red ), 2.0f ) );
-    this->_segment.draw( painter, drawTan);
+    this->_segment.draw( painter, drawTan , drawPol );
 }
 
 CurvePath& CubicCurveFitter::curve( void )
@@ -101,8 +108,8 @@ CurvePath& CubicCurveFitter::curve( void )
 
 void CubicCurveFitter::finish( void )
 {
-    this->_path.addSegment(this->_segment);
-    this->_NewPath = true;
+    this->_path.addSegment( this->_segment ) ;
+    this->_NewPath = true ;
 }
 
 void CubicCurveFitter::addPoint( QPointF p )
@@ -110,19 +117,22 @@ void CubicCurveFitter::addPoint( QPointF p )
     if( this->_NewPath )
     {
         this->_segment.set( p , p , p , p );
-        this->_NewPath = false;
         this->_poliline.push_back( p );
         this->_field.clear();
         this->_field.putPoint( p );
+        this->_NewPath = false;
         return;
     }
+
+    bool forceTan = !( _poliline.size() == 1) ;
 
     this->_poliline.push_back( p );
 
     uint32 iEnd = this->_poliline.size()-1;
     QPointF preview = this->_poliline[ iEnd - 1 ];
 
-    CubicCurveFitter::RESULT rslt = this->_update( p );
+
+    CubicCurveFitter::RESULT rslt = this->_update( p , forceTan );
 
     if( rslt != SUCCESS )
     {
@@ -166,15 +176,15 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
     this->_segment.setC3( p );
     this->_segment.setC2( this->_segment.getC2() + ( p - previewSegment.getC3() ) );
 
-    this->_field.putPoint( p );
     this->_field.putLine( previewSegment.getC3() , p );
+    this->_field.putPoint( p );
 
-//    if( !firstTry )
-//    {
+    if( !firstTry )
+    {
 //        QPointF median = ( this->_segment.getC3() + this->_segment.getC0() )*0.5;
-//        this->_segment.setC1( median );
-//        this->_segment.setC2( median );
-//    }
+        this->_segment.setC1( this->_segment.getC3() );
+        this->_segment.setC2( this->_segment.getC0() );
+    }
 
     uint32 nInteration = 0;
     real error = this->_erro();
@@ -187,8 +197,9 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
         real t ;
         QPointF Bti ;
         real di ;
+        uint32 infCount = 0;
 
-        for( uint32 i = 1 ; i < N_SAMPLES ;++i )
+        for( uint32 i = 1 ; i < N_SAMPLES ; ++i )
         {
             t = (real)i*delta;
             QPointF evalPoint =  this->_segment.eval( t ) ;
@@ -200,57 +211,34 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
                 f1 += (t*(1.0-t)*(1.0-t)*di)*Bti;
                 f2 += (t*  t    *(1.0-t)*di)*Bti;
             }
+//            else
+//            {
+//                ++infCount;
+//                std::cerr << "CubicCurveFitter::_update INF -- infCount = " << infCount << "  -- infRel = "<< (real)infCount*delta << " --- i = " << i  << std::endl;
+//            }
         }
         f1*= ( 6.0*delta );
         f2*= ( 6.0*delta );
 
-//        this->_segment.setC1( this->_segment.getC1() + f1 );
-//        this->_segment.setC2( this->_segment.getC2() + f2 );
-//
-//        if(this->_G1)
-//        {
-//            QPointF tan = this->_path.tanC3last();
-//            QPointF P = this->_segment.tanC0();
-//            real normT = norm( tan ) ;
-//            if( normT > eps )
-//            {
-//                tan /= normT;
-//                P = tan * abs( dot( tan , P ) );
-//                this->_segment.setC1( ( P/3.0 ) + this->_segment.getC0() ) ;
-//            }
-//            else
-//            {
-//                std::cerr << "CubicCurveFitter::_update - normT < eps " << std::endl;
-//            }
-//        }
-
+        this->_segment.setC1( this->_segment.getC1() + f1 );
         this->_segment.setC2( this->_segment.getC2() + f2 );
 
         if(this->_G1)
         {
             QPointF tan = this->_path.tanC3last();
+            QPointF P = this->_segment.tanC0(); // tanC0() = 3*( C1 - C0 )
+            P /= 3.0;
             real normT = norm( tan ) ;
             if( normT > eps )
             {
                 tan /= normT;
-                f1 = tan * abs( dot( tan , f1 ) );
+                P = tan * abs( dot( tan , P ) );
+                this->_segment.setC1( P + this->_segment.getC0() ) ;
             }
             else
             {
                 std::cerr << "CubicCurveFitter::_update - normT < eps " << std::endl;
             }
-        }
-        this->_segment.setC1( this->_segment.getC1() + f1 );
-
-        QPointF P1 = this->_segment.tanC0();
-        if( normQuad( P1 ) < 9.0 )
-        {
-            this->_segment.setC1( this->_segment.getC0() + 3*P1 );
-        }
-        QPointF P2 = this->_segment.tanC3();
-        if( normQuad( P2 ) < 9.0 )
-        {
-            this->_segment.setC2( this->_segment.getC0() - 3*P2 );
         }
 
         error = this->_erro();
@@ -268,18 +256,16 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
 
 bool CubicCurveFitter::_isCorner( QPointF p )
 {
-    if( this->_segment.getC3() == this->_segment.getC2() ) return false;
-
     QPointF tan = this->_segment.tanC3();
-
     QPointF pTest = p - this->_segment.getC3();
-
 
     real normP = norm( pTest ) ;
     real normT = norm( tan ) ;
     if( normP < eps || normT < eps )
     {
-        std::cerr << "CubicCurveFitter::_isCorner " << normP  << " -- " << normT << std::endl;
+        this->_tmpTan = tan;
+        this->_tmpTanPoints = pTest;
+        this->_tmpTeste = this->_segment.getC3();
         return false;
     }
     pTest /= normP;
@@ -291,7 +277,7 @@ bool CubicCurveFitter::_isCorner( QPointF p )
 
     real dotTP = dot( tan , pTest );
 
-    return ( dotTP < CORNER_ANGLE );
+    return ( dotTP < this->_cornerAngle );
 }
 
 
@@ -307,7 +293,7 @@ real CubicCurveFitter::_erro( void )
         QPointF Bti = this->_segment.eval( t ) ;
 
         real dix = this->_field.dx( Bti ), diy = this->_field.dy( Bti) , di ;
-        di = (  dix < INF )? dix*dix + diy*diy : infLocal ;
+        di = (  dix < INF )? dix*dix + diy*diy : this->_radius ;
         error += di;
     }
     error/=(real)N_SAMPLES;

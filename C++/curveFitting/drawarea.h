@@ -29,7 +29,15 @@ private:
     DistanceField _distance;
     uint32 _radius;
 
-    QVector<CurvePath> _paths;
+    QVector<CurvePath> _path;
+    QVector<QPolygonF> _polyline;
+    QVector<QPolygonF> _corner;
+    QVector<QPolygonF> _tan;
+    QVector<QPolygonF> _pTan;
+    QVector<QPolygonF> _vTeste;
+
+
+
     CubicCurveFitter _cubicCurve;
     real _erroTol;
 
@@ -39,7 +47,8 @@ private:
     bool _showDistanceFieldDy;
     bool _showDistanceFieldD;
     bool _showTan;
-    bool _showPolyline;
+    bool _showPol;
+    bool _showDataIn;
     bool _showCurve;
     bool _showCorner;
     bool _showAngles;
