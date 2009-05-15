@@ -197,7 +197,6 @@ CubicCurveFitter::RESULT CubicCurveFitter::_update( QPointF p , bool firstTry )
         real t ;
         QPointF Bti ;
         real di ;
-        uint32 infCount = 0;
 
         for( uint32 i = 1 ; i < N_SAMPLES ; ++i )
         {
@@ -285,7 +284,6 @@ real CubicCurveFitter::_erro( void )
 {
     real error = 0.0;
     real delta = 1.0/N_SAMPLES;
-    real infLocal = INF*delta*0.5;
 
     for( uint32 i = 1 ; i < N_SAMPLES ;++i )
     {

@@ -8,12 +8,12 @@
 
 DistanceField::DistanceField( uint32 w , uint32 h , uint32 radius )
 {
-    this->_w = w;
-    this->_h = h;
-    this->_radius = radius;
-    this->_numberOfElements = (w+2*radius)*(h+2*radius);
-    this->_dx = std::vector<real> ( this->_numberOfElements , INF_LOCAL);
-    this->_dy = std::vector<real> ( this->_numberOfElements , INF_LOCAL);
+    this->pW = w;
+    this->pH = h;
+    this->pRadius = radius;
+    this->pNumberOfElements = (w+2*radius)*(h+2*radius);
+    this->pDx = std::vector<real> ( this->pNumberOfElements , INF_LOCAL);
+    this->pDy = std::vector<real> ( this->pNumberOfElements , INF_LOCAL);
 }
 
 DistanceField::DistanceField(const DistanceField &field)
@@ -23,22 +23,22 @@ DistanceField::DistanceField(const DistanceField &field)
 
 void DistanceField::initialize( uint32 w , uint32 h , uint32 radius )
 {
-    this->_w = w;
-    this->_h = h;
-    this->_radius = radius;
-    this->_numberOfElements = (w+2*radius)*(h+2*radius);
-    this->_dx = std::vector<real> ( this->_numberOfElements , INF_LOCAL);
-    this->_dy = std::vector<real> ( this->_numberOfElements , INF_LOCAL);
+    this->pW = w;
+    this->pH = h;
+    this->pRadius = radius;
+    this->pNumberOfElements = (w+2*radius)*(h+2*radius);
+    this->pDx = std::vector<real> ( this->pNumberOfElements , INF_LOCAL);
+    this->pDy = std::vector<real> ( this->pNumberOfElements , INF_LOCAL);
 }
 
 DistanceField &DistanceField::operator=(const DistanceField &field)
 {
-    this->_dx = field._dx;
-    this->_dy = field._dy;
-    this->_w = field._w;
-    this->_h = field._h;
-    this->_radius =  field._radius;
-    this->_numberOfElements = field._numberOfElements;
+    this->pDx = field.pDx;
+    this->pDy = field.pDy;
+    this->pW = field.pW;
+    this->pH = field.pH;
+    this->pRadius =  field.pRadius;
+    this->pNumberOfElements = field.pNumberOfElements;
 
     return (*this);
 }
@@ -123,8 +123,8 @@ void DistanceField::putLine( QPointF a , QPointF b )
     real ttx = hx * abnormInv;
     real tty = hy * abnormInv;
 
-    hx = 2.0 * this->_radius * ( ttx ) ;
-    hy = 2.0 * this->_radius * ( tty ) ;
+    hx = 2.0 * this->pRadius * ( ttx ) ;
+    hy = 2.0 * this->pRadius * ( tty ) ;
 
     real ddx =  -( 0.5 * hx );
     real ddy =  -( 0.5 * hy );
@@ -170,14 +170,14 @@ void DistanceField::putLine( QPointF a , QPointF b )
                                     ( this->dy( xij + k , yij + l  ) * this->dy( xij + k , yij + l  ) ) ;
                         if( ( tmpD ) >  ( (tmpVx*tmpVx) + (tmpVy*tmpVy) ) )
                         {
-                            this->_setDx( xij + k , yij + l , -tmpVx ) ;
-                            this->_setDy( xij + k , yij + l , -tmpVy ) ;
+                            this->pSetDx( xij + k , yij + l , -tmpVx ) ;
+                            this->pSetDy( xij + k , yij + l , -tmpVy ) ;
                         }
                     }
                     else
                     {
-                        this->_setDx( xij + k , yij + l , -tmpVx ) ;
-                        this->_setDy( xij + k , yij + l , -tmpVy ) ;
+                        this->pSetDx( xij + k , yij + l , -tmpVx ) ;
+                        this->pSetDy( xij + k , yij + l , -tmpVy ) ;
                     }
                 }
             }
@@ -196,28 +196,28 @@ void DistanceField::putLine( QPointF a , QPointF b )
 
 void DistanceField::putPoint( QPointF a )
 {
-    uint32 r2 = 2*this->_radius;
+    uint32 r2 = 2*this->pRadius;
 
     for(uint32 i = 0 ; i < r2 ; ++i )
     {
         for(uint32 j = 0 ; j < r2 ; ++j )
         {
-            int ddx =  i - this->_radius ;
-            int ddy =  j - this->_radius ;
+            int ddx =  i - this->pRadius ;
+            int ddy =  j - this->pRadius ;
             int xij = ROUND(a.x()) + ddx, yij = ROUND(a.y()) + ddy ;
             if( this->dx( xij , yij ) < INF_LOCAL)
             {
                 real tmpDx = this->dx( xij ,yij ) , tmpDy =  this->dy( xij ,yij ) ;
                 if( ( tmpDx*tmpDx + tmpDy*tmpDy ) >  ( (ddx * ddx ) + ( ddy * ddy ) ) )
                 {
-                    this->_setDx( xij ,yij , -(real)ddx ) ;
-                    this->_setDy( xij ,yij , -(real)ddy ) ;
+                    this->pSetDx( xij ,yij , -(real)ddx ) ;
+                    this->pSetDy( xij ,yij , -(real)ddy ) ;
                 }
             }
             else
             {
-                this->_setDx( xij ,yij , -(real)ddx ) ;
-                this->_setDy( xij ,yij , -(real)ddy ) ;
+                this->pSetDx( xij ,yij , -(real)ddx ) ;
+                this->pSetDy( xij ,yij , -(real)ddy ) ;
             }
         }
     }
@@ -225,14 +225,14 @@ void DistanceField::putPoint( QPointF a )
 
 QImage DistanceField::toImageDx( void )
 {
-    real r = (real)(this->_radius) + 2.0 ;
-    uint32 r2 = 2*this->_radius;
-    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real r = (real)(this->pRadius) + 2.0 ;
+    uint32 r2 = 2*this->pRadius;
+    QImage image( this->pW + r2 , this->pH + r2 , QImage::Format_ARGB32 );
     real invMax = 1.0/(2.0f*r);
 
-    for ( int i = 0 ; i < (int)this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->pW ; ++i )
     {
-        for ( int j = 0 ; j < (int)this->_h ; ++j )
+        for ( int j = 0 ; j < (int)this->pH ; ++j )
         {
             if( this->dx( i , j) < INF_LOCAL)
             {
@@ -247,14 +247,14 @@ QImage DistanceField::toImageDx( void )
 
 QImage DistanceField::toImageDy( void )
 {
-    real r = (real)(this->_radius) + 2.0 ;
-    uint32 r2 = 2*this->_radius;
-    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real r = (real)(this->pRadius) + 2.0 ;
+    uint32 r2 = 2*this->pRadius;
+    QImage image( this->pW + r2 , this->pH + r2 , QImage::Format_ARGB32 );
     real invMax = 1.0/(2.0f*r);
 
-    for ( int i = 0 ; i < (int)this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->pW ; ++i )
     {
-        for ( int j = 0 ; j < (int)this->_h ; ++j )
+        for ( int j = 0 ; j < (int)this->pH ; ++j )
         {
             if( this->dx( i , j) < INF_LOCAL)
             {
@@ -269,14 +269,14 @@ QImage DistanceField::toImageDy( void )
 
 QImage DistanceField::toImageD( void )
 {
-    real r = (real)(this->_radius) + 2.0 ;
-    uint32 r2 = 2*this->_radius;
-    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real r = (real)(this->pRadius) + 2.0 ;
+    uint32 r2 = 2*this->pRadius;
+    QImage image( this->pW + r2 , this->pH + r2 , QImage::Format_ARGB32 );
     real invMax = 1.0/(2*r*r);
 
-    for ( int i = 0 ; i < (int)this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->pW ; ++i )
     {
-        for ( int j = 0 ; j < (int)this->_h ; ++j )
+        for ( int j = 0 ; j < (int)this->pH ; ++j )
         {
             if( this->dx( i , j) < INF_LOCAL)
             {
@@ -291,15 +291,15 @@ QImage DistanceField::toImageD( void )
 
 QImage DistanceField::toImageRGB( void )
 {
-    real r = (real)(this->_radius) + 2.0 ;
-    uint32 r2 = 2*this->_radius;
-    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real r = (real)(this->pRadius) + 2.0 ;
+    uint32 r2 = 2*this->pRadius;
+    QImage image( this->pW + r2 , this->pH + r2 , QImage::Format_ARGB32 );
     real invMaxS = 1.0/(2*r*r);
     real invMax = 1.0/(2.0f*r);
 
-    for ( int i = 0 ; i < (int)this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->pW ; ++i )
     {
-        for ( int j = 0 ; j < (int)this->_h ; ++j )
+        for ( int j = 0 ; j < (int)this->pH ; ++j )
         {
             if( this->dx( i , j ) < INF_LOCAL)
             {
@@ -316,15 +316,15 @@ QImage DistanceField::toImageRGB( void )
 
 QImage DistanceField::toImageRGBTest( void )
 {
-    real r = (real)(this->_radius) + 2.0 ;
-    uint32 r2 = 2*this->_radius;
-    QImage image( this->_w + r2 , this->_h + r2 , QImage::Format_ARGB32 );
+    real r = (real)(this->pRadius) + 2.0 ;
+    uint32 r2 = 2*this->pRadius;
+    QImage image( this->pW + r2 , this->pH + r2 , QImage::Format_ARGB32 );
     real invMaxS = 1.0/(2*r*r);
     real invMax = 1.0/(2.0f*r);
 
-    for ( int i = 0 ; i < (int)this->_w ; ++i )
+    for ( int i = 0 ; i < (int)this->pW ; ++i )
     {
-        for ( int j = 0 ; j < (int)this->_h ; ++j )
+        for ( int j = 0 ; j < (int)this->pH ; ++j )
         {
             if( this->dx( i , j ) < INF_LOCAL )
             {

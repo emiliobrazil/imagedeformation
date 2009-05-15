@@ -10,7 +10,6 @@ DrawArea::DrawArea(QWidget *parent)
     :QWidget(parent)
 {
     uint32 w = 1024 , h = 900 ;
-//    this->_image = QImage( w, h ,QImage::Format_ARGB32 );
     this->resize( w , h );
     this->setFocusPolicy(Qt::ClickFocus);
     this->_radius = 20;
@@ -29,6 +28,7 @@ DrawArea::DrawArea(QWidget *parent)
     this->_showCurve = true;
     this->_showCorner = false;
     this->_showAngles = false;
+    this->_showBb = false;
 
     this->_erroTol = 1.0;
     this->factor = 1.0;
@@ -95,6 +95,16 @@ void DrawArea::paintEvent(QPaintEvent *event)
 
 
     this->_cubicCurve.draw( painter , this->_showTan , this->_showPol );
+
+    if( this->_showBb )
+    {
+        painter.setPen( QPen( QBrush( Qt::darkYellow ), 3.0f ) );
+        for( int i = 0 ; i < this->_path.size() ; ++i )
+        {
+            QRectF tmp = this->_path[i].getBoudingBox();
+            painter.drawRect( tmp );
+        }
+    }
 
     if( this->_showCurve )
     {
@@ -202,6 +212,7 @@ void DrawArea::keyPressEvent ( QKeyEvent * event )
         break;
     case Qt::Key_R:
         this->_showPol = !this->_showPol;
+        this->_showBb = !this->_showBb;
         break;
     case Qt::Key_O:
         this->_showCurve = !this->_showCurve;

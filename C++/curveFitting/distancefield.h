@@ -22,14 +22,14 @@ public:
     void initialize( uint32 w , uint32 h , uint32 radius );
 
     inline real dx( int i , int j ){
-        uint32 index = this->_index( i , j );
-        if( index > this->_numberOfElements ) return INF ;
-        return this->_dx[ index ];
+        uint32 index = this->pIndex( i , j );
+        if( index > this->pNumberOfElements ) return INF ;
+        return this->pDx[ index ];
     }
     inline real dy( int i , int j ){
-        uint32 index = this->_index( i , j );
-        if( index > this->_numberOfElements ) return INF ;
-        return this->_dy[ index ];
+        uint32 index = this->pIndex( i , j );
+        if( index > this->pNumberOfElements ) return INF ;
+        return this->pDy[ index ];
     }
 
     real dx( real x , real y ) ;
@@ -43,24 +43,23 @@ public:
     void putLine( QPointF a , QPointF b ) ;
     void putPoint( QPointF a ) ;
 
-    QImage toImageRGBTest( void );
-
     QImage toImageDx( void );
     QImage toImageDy( void );
     QImage toImageD( void );
     QImage toImageRGB( void );
+    QImage toImageRGBTest( void );
 
     inline void clear( void ){
-        this->_dx.clear();
-        this->_dy.clear();
-        this->_dx = std::vector<real> ( _numberOfElements , INF) ;
-        this->_dy = std::vector<real> ( _numberOfElements , INF) ;
+        this->pDx.clear();
+        this->pDy.clear();
+        this->pDx = std::vector<real> ( pNumberOfElements , INF) ;
+        this->pDy = std::vector<real> ( pNumberOfElements , INF) ;
     }
 
 protected:
-    inline void _setDx( int i , int j , real v ){ this->_dx[ this->_index( i , j ) ] = v ; }
-    inline void _setDy( int i , int j , real v ){ this->_dy[ this->_index( i , j ) ] = v ; }
-    inline uint32 _index( int i , int j ){ return ( j + this->_radius )*( this->_w + (2 * this->_radius) ) + ( i + this->_radius ); }
+    inline void pSetDx( int i , int j , real v ){ this->pDx[ this->pIndex( i , j ) ] = v ; }
+    inline void pSetDy( int i , int j , real v ){ this->pDy[ this->pIndex( i , j ) ] = v ; }
+    inline uint32 pIndex( int i , int j ){ return ( j + this->pRadius )*( this->pW + (2 * this->pRadius) ) + ( i + this->pRadius ); }
 
     inline real _kBilinear( real x ){
         if (x<-1.0f) return 0.0f;
@@ -70,9 +69,9 @@ protected:
     }
 
 private:
-    uint32 _w , _h , _radius , _numberOfElements;
-    std::vector<real> _dx;
-    std::vector<real> _dy;
+    uint32 pW , pH , pRadius , pNumberOfElements;
+    std::vector<real> pDx;
+    std::vector<real> pDy;
 };
 
 #endif // DISTANCEFIELD_H
