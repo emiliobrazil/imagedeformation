@@ -52,6 +52,7 @@ private:
     bool _showCurve;
     bool _showCorner;
     bool _showAngles;
+    bool _showBb;
 
     real factor;
 
