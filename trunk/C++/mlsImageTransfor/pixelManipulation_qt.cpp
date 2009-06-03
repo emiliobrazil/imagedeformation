@@ -177,6 +177,104 @@ QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel )
     return color;
 }
 
+real byteToReal( unsigned char c, int offset, int scale )
+{
+        return ( (int)c - offset ) / (real) scale;
+}
+
+unsigned char realToByte( real d, int offset, int scale, real max_value )
+{
+        int i = offset + (int) ( scale * ( d / max_value ) );
+        if ( i >= 255 ) return 255;
+        else if ( i <= 0 ) return 0;
+        return (unsigned char) i;
+}
+
+void fromNormalToGradient( QRgb normal, real& dx, real& dy )
+{
+        real nx = byteToReal( qRed(normal), 128, 128 );
+        real ny = byteToReal( qGreen(normal), 128, 128 );
+        real nz = byteToReal( qBlue(normal), 128, 128 );
+
+        real norm = sqrt( nx*nx + ny*ny + nz*nz );
+        nx /= norm; ny /= norm; nz /= norm;
+
+        dx = - nx / nz;
+        dy = - ny / nz;
+}
+
+void fromGradientToNormal( QRgb& normal, real dx, real dy )
+{
+        real nx = -dx, ny = -dy, nz = 1;
+
+        real norm = sqrt( nx*nx + ny*ny + nz*nz );
+        nx /= norm; ny /= norm; nz /= norm;
+
+        normal = qRgb( realToByte( nx, 128, 128, 1 ),
+                       realToByte( ny, 128, 128, 1 ),
+                       realToByte( nz, 128, 128, 1 ) );
+}
+
+void fromGradientToColor( QRgb& normal, real dx, real dy )
+{
+        normal = qRgb( realToByte( dx, 128, 128, 1 ),
+                       realToByte( dy, 128, 128, 1 ),
+                       realToByte( 0, 128, 128, 1 ) );
+}
+
+void getJacobian( const std::vector< std::pair<Vector2D,Vector2D> >& vectorField, int i, real& dg1dx, real& dg1dy, real& dg2dx, real& dg2dy )
+{
+        real x = vectorField[i].first.x();
+        real y = vectorField[i].first.y();
+
+        real u = vectorField[i].second.x();
+        real v = vectorField[i].second.y();
+
+        real uy = vectorField[i+1].second.x();
+        real vy = vectorField[i+1].second.y();
+
+        dg1dy = ( x + uy ) - ( x + u );
+        dg2dy = ( y + 1 + vy ) - ( y + v );
+
+        // i+1 is wrong, which one is the neighbour on top?
+        real ux = vectorField[i+1].second.x();
+        real vx = vectorField[i+1].second.y();
+
+        dg1dx = ( x + 1 + ux ) - ( x + u );
+        dg2dx = ( y + vx ) - ( y + v );
+}
+
+void transformImageNormal( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField )
+{
+    uint32 numberOfVectors = vectorField.size();
+    for ( uint32 i=0 ; i < numberOfVectors ;++i)
+    {
+        real x = vectorField[i].first.x();
+        real y = vectorField[i].first.y();
+
+        real u = vectorField[i].second.x();
+        real v = vectorField[i].second.y();
+
+        if ( i+1 < vectorField.size() )
+        {
+            QRgb normal = pixelValue( image , QPointF( x + u  , y + v ) );
+
+            real dx, dy;
+            fromNormalToGradient( normal, dx, dy );
+
+            real dg1dx, dg1dy, dg2dx, dg2dy;
+            getJacobian( vectorField, i, dg1dx, dg1dy, dg2dx, dg2dy );
+
+            real dx2 = dx * dg1dx + dy * dg2dx;
+            real dy2 = dx * dg1dy + dy * dg2dy;
+
+            fromGradientToNormal( normal, dx2, dy2 );
+
+            finalImage.setPixel( (uint32)x , (uint32)y , normal ) ;
+        }
+    }
+}
+
 void transformImage( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField )
 {
     uint32 numberOfVectors = vectorField.size();

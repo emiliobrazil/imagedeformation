@@ -30,6 +30,7 @@ real kernelBilinear( real x );
 real kernelCubic( real x );
 QRgb pixelValue(const QImage& image , QPointF P , interpolationKernel kernel =  BILINEAR );
 void transformImage( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField );
+void transformImageNormal( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField );
 
 QImage eBitMapMask( QSize imageSize ,  QVector<QPointF> points  );
 
