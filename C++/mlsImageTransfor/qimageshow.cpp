@@ -196,7 +196,7 @@ void qImageShow::_buildField( void )
     j0 = maximum( 0 , (uint32)floor( bBox.top() ) ) ;
     j1 = minimum( this->_finalImage.height() , (uint32)floor( bBox.bottom() ) );
 
-    this->_vectorField = std::vector< std::pair<Vector2D,Vector2D > >();
+    /*this->_vectorField = std::vector< std::pair<Vector2D,Vector2D > >();
 
     for( uint32 i = i0  ; i < i1 ; i++ )
     {
@@ -209,7 +209,29 @@ void qImageShow::_buildField( void )
                 this->_vectorField.push_back( std::pair<Vector2D,Vector2D> ( p , v ) );
             }
         }
+    }*/
+
+    this->_vectorField = std::vector< std::pair<Vector2D,Vector2D > >();
+    this->_jacobianField = std::vector< std::pair<Vector2D,Vector2D> >();
+
+    for( uint32 i = i0  ; i < i1 ; i++ )
+    {
+        for( uint32 j = j0 ; j < j1 ; j++ )
+        {
+            if( qGray( this->_maskF.pixel( i , j ) ) > 0  )
+            {
+                Vector2D p( (float)i , (float)j );
+                Vector2D v = evalField( (float)i , (float)j , this->_field );
+
+                Vector2D vy = evalField( (float)i , (float)j+1 , this->_field );
+                Vector2D vx = evalField( (float)i+1 , (float)j , this->_field );
+
+                this->_vectorField.push_back( std::pair<Vector2D,Vector2D> ( p , v ) );
+                this->_jacobianField.push_back( std::pair<Vector2D,Vector2D> ( vx-v , vy-v ) );
+            }
+        }
     }
+
    fprintf(stderr, "Field builded\n");
 }
 
@@ -296,7 +318,8 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         //        this->_finalImage.setAlphaChannel( this->_maskF );
         this->_setField();
         this->_buildField();
-        transformImage( this->_image , this->_finalImage , this->_vectorField );
+        //transformImage( this->_image , this->_finalImage , this->_vectorField );
+        transformImageNormal( this->_image , this->_finalImage , this->_vectorField, this->_jacobianField );
         break;
     case Qt::Key_L:
         fileName = QFileDialog::getSaveFileName(this,tr("Export Lines"), QDir::currentPath()+"/lineNew.lin",tr("lines (*.lin)"));

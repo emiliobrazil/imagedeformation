@@ -62,6 +62,7 @@ private:
     real _MLSRadius;
 
     std::vector< std::pair<Vector2D,Vector2D> > _vectorField;
+    std::vector< std::pair<Vector2D,Vector2D> > _jacobianField;
     std::vector< std::pair<Vector2D,Vector2D> > _vectorSamples;
 
     QSize _size;

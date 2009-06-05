@@ -217,11 +217,11 @@ void fromGradientToNormal( QRgb& normal, real dx, real dy )
 
 void fromGradientToColor( QRgb& normal, real dx, real dy )
 {
-        normal = qRgb( realToByte( dx, 128, 128, 1 ),
-                       realToByte( dy, 128, 128, 1 ),
-                       realToByte( 0, 128, 128, 1 ) );
+        normal = qRgb( realToByte( -1, 128, 128, 0.35 ),
+                       realToByte( dy-0.3, 128, 128, 0.15),
+                       realToByte( -1, 128, 128, 1 ) );
 }
-
+/*
 void getJacobian( const std::vector< std::pair<Vector2D,Vector2D> >& vectorField, int i, real& dg1dx, real& dg1dy, real& dg2dx, real& dg2dy )
 {
         real x = vectorField[i].first.x();
@@ -242,9 +242,12 @@ void getJacobian( const std::vector< std::pair<Vector2D,Vector2D> >& vectorField
 
         dg1dx = ( x + 1 + ux ) - ( x + u );
         dg2dx = ( y + vx ) - ( y + v );
-}
 
-void transformImageNormal( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField )
+        printf("%lf %lf\n", dg1dx, dg1dy);
+        printf("%lf %lf\n\n", dg2dx, dg2dy);
+}
+*/
+void transformImageNormal( const QImage& image , QImage& finalImage , const std::vector< std::pair<Vector2D,Vector2D> >& vectorField, std::vector< std::pair<Vector2D,Vector2D> > jacobian )
 {
     uint32 numberOfVectors = vectorField.size();
     for ( uint32 i=0 ; i < numberOfVectors ;++i)
@@ -255,20 +258,29 @@ void transformImageNormal( const QImage& image , QImage& finalImage , const std:
         real u = vectorField[i].second.x();
         real v = vectorField[i].second.y();
 
+        real dg1dx = jacobian[i].first.x()+1;
+        real dg2dx = jacobian[i].first.y();
+
+        real dg1dy = jacobian[i].second.x();
+        real dg2dy = jacobian[i].second.y()+1;
+
+        printf("%lf %lf\n", dg1dx, dg1dy);
+        printf("%lf %lf\n\n", dg2dx, dg2dy);
+
         if ( i+1 < vectorField.size() )
         {
             QRgb normal = pixelValue( image , QPointF( x + u  , y + v ) );
 
             real dx, dy;
             fromNormalToGradient( normal, dx, dy );
-
-            real dg1dx, dg1dy, dg2dx, dg2dy;
-            getJacobian( vectorField, i, dg1dx, dg1dy, dg2dx, dg2dy );
+            //getJacobian( vectorField, i, dg1dx, dg1dy, dg2dx, dg2dy );
 
             real dx2 = dx * dg1dx + dy * dg2dx;
             real dy2 = dx * dg1dy + dy * dg2dy;
 
+            //fromGradientToColor( normal, dg1dy, dg2dy );
             fromGradientToNormal( normal, dx2, dy2 );
+            //fromGradientToShading( shade, dx2, dy2 );
 
             finalImage.setPixel( (uint32)x , (uint32)y , normal ) ;
         }
