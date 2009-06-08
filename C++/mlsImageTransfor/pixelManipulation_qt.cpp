@@ -193,7 +193,7 @@ unsigned char realToByte( real d, int offset, int scale, real max_value )
 void fromNormalToGradient( QRgb normal, real& dx, real& dy )
 {
         real nx = byteToReal( qRed(normal), 128, 128 );
-        real ny = byteToReal( qGreen(normal), 128, 128 );
+        real ny = -1 * byteToReal( qGreen(normal), 128, 128 );
         real nz = byteToReal( qBlue(normal), 128, 128 );
 
         real norm = sqrt( nx*nx + ny*ny + nz*nz );
@@ -211,8 +211,23 @@ void fromGradientToNormal( QRgb& normal, real dx, real dy )
         nx /= norm; ny /= norm; nz /= norm;
 
         normal = qRgb( realToByte( nx, 128, 128, 1 ),
-                       realToByte( ny, 128, 128, 1 ),
+                       -1 * realToByte( ny, 128, 128, 1 ),
                        realToByte( nz, 128, 128, 1 ) );
+}
+
+void fromGradientToShading( QRgb& shade, real dx, real dy, real lx, real ly, real lz )
+{
+        real nx = -dx, ny = -dy, nz = 1;
+
+        real norm = sqrt( nx*nx + ny*ny + nz*nz );
+        nx /= norm; ny /= norm; nz /= norm;
+
+        real d = nx * lx + ny * ly + nz * lz;
+        //if ( d < 0 ) d = 0;
+
+        shade = qRgb( realToByte( d, 0, 255, 1 ),
+                       realToByte( d, 0, 255, 1 ),
+                       realToByte( d, 0, 255, 1 ) );
 }
 
 void fromGradientToColor( QRgb& normal, real dx, real dy )
@@ -264,25 +279,43 @@ void transformImageNormal( const QImage& image , QImage& finalImage , const std:
         real dg1dy = jacobian[i].second.x();
         real dg2dy = jacobian[i].second.y()+1;
 
-        printf("%lf %lf\n", dg1dx, dg1dy);
-        printf("%lf %lf\n\n", dg2dx, dg2dy);
+        //printf("%lf %lf\n", dg1dx, dg1dy);
+        //printf("%lf %lf\n\n", dg2dx, dg2dy);
 
-        if ( i+1 < vectorField.size() )
+        QRgb normal = pixelValue( image , QPointF( x + u  , y + v ) );
+
+        real dx, dy;
+        fromNormalToGradient( normal, dx, dy );
+        //getJacobian( vectorField, i, dg1dx, dg1dy, dg2dx, dg2dy );
+
+        //real dx2 = dx;
+        //real dy2 = dy;
+
+        real dx2 = dx * dg1dx + dy * dg2dx;
+        real dy2 = dx * dg1dy + dy * dg2dy;
+
+        //fromGradientToColor( normal, dg1dy, dg2dy );
+        fromGradientToNormal( normal, dx2, dy2 );
+        //fromGradientToShading( normal, dx2, dy2, 1, 0, 0 );
+
+        finalImage.setPixel( (uint32)x , (uint32)y , normal ) ;
+    }
+}
+
+void normalToShade( const QImage& normalImage , QImage& finalImage )
+{
+    QSize s = normalImage.size();
+    for ( uint32 i=0 ; i < s.width() ;++i)
+    {
+        for ( uint32 j=0 ; j < s.height() ;++j)
         {
-            QRgb normal = pixelValue( image , QPointF( x + u  , y + v ) );
+            QRgb normal =  normalImage.pixel( i , j );
 
             real dx, dy;
             fromNormalToGradient( normal, dx, dy );
-            //getJacobian( vectorField, i, dg1dx, dg1dy, dg2dx, dg2dy );
+            fromGradientToShading( normal, dx, dy, 1, 0, 0 );
 
-            real dx2 = dx * dg1dx + dy * dg2dx;
-            real dy2 = dx * dg1dy + dy * dg2dy;
-
-            //fromGradientToColor( normal, dg1dy, dg2dy );
-            fromGradientToNormal( normal, dx2, dy2 );
-            //fromGradientToShading( shade, dx2, dy2 );
-
-            finalImage.setPixel( (uint32)x , (uint32)y , normal ) ;
+            finalImage.setPixel( i , j , normal ) ;
         }
     }
 }
