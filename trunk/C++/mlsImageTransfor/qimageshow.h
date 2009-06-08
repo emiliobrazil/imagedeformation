@@ -38,6 +38,9 @@ protected:
     void _setField( void );
     void _buildField( void );
 
+    void setUpBuild( void );
+
+
 private:
     QImage _image;
 

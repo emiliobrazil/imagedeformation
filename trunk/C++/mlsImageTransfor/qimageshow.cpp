@@ -272,9 +272,31 @@ void qImageShow::_drawVectorField( QPainter &painter )
     }
 }
 
+void qImageShow::setUpBuild()
+{
+            this->_lineA.close();
+        this->_lineA.lineFilter();
+        this->_lineB.lineFilter( 0.5 );
+        this->_lineD = this->_lineA.split( this->_lineB.atBegin() , this->_lineB.atEnd() ) ;
+        this->_lineB.insertPoint( this->_lineD.atBegin() , 0 );
+        this->_lineB.insertPoint( this->_lineD.atEnd() );
+        this->_lineD.reparametri( this->_lineB );
+        this->_lineC = this->_lineA.join( this->_lineB );
+        this->_lineC.close();
+        this->_maskF = eBitMapMask( this->_image.size() , this->_lineC.toVector() );
+        this->_showMaskF = false;
+        this->_showImageFinal = true;
+        this->_finalImage = QImage( this->_size , QImage::Format_ARGB32 );
+        //        this->_finalImage.setAlphaChannel( this->_maskF );
+        this->_setField();
+        this->_buildField();
+}
+
+
 void qImageShow::keyPressEvent ( QKeyEvent * event )
 {
     QString fileName;
+    QImage shadedImage( _image );
     std::pair< uint32,QPointF > pairTeste ;
     switch ( event->key() )
     {
@@ -301,26 +323,22 @@ void qImageShow::keyPressEvent ( QKeyEvent * event )
         }
         break;
 
+    case Qt::Key_K:
+        normalToShade( _image , shadedImage );
+        fileName = tr("/home/b/emilio/shaded.png");
+        shadedImage.save(fileName);
+        break;
+
     case Qt::Key_D:
-        this->_lineA.close();
-        this->_lineA.lineFilter();
-        this->_lineB.lineFilter( 0.5 );
-        this->_lineD = this->_lineA.split( this->_lineB.atBegin() , this->_lineB.atEnd() ) ;
-        this->_lineB.insertPoint( this->_lineD.atBegin() , 0 );
-        this->_lineB.insertPoint( this->_lineD.atEnd() );
-        this->_lineD.reparametri( this->_lineB );
-        this->_lineC = this->_lineA.join( this->_lineB );
-        this->_lineC.close();
-        this->_maskF = eBitMapMask( this->_image.size() , this->_lineC.toVector() );
-        this->_showMaskF = false;
-        this->_showImageFinal = true;
-        this->_finalImage = QImage( this->_size , QImage::Format_ARGB32 );
-        //        this->_finalImage.setAlphaChannel( this->_maskF );
-        this->_setField();
-        this->_buildField();
-        //transformImage( this->_image , this->_finalImage , this->_vectorField );
+        setUpBuild();
+        transformImage( this->_image , this->_finalImage , this->_vectorField );
+        break;
+
+    case Qt::Key_J:
+        setUpBuild();
         transformImageNormal( this->_image , this->_finalImage , this->_vectorField, this->_jacobianField );
         break;
+
     case Qt::Key_L:
         fileName = QFileDialog::getSaveFileName(this,tr("Export Lines"), QDir::currentPath()+"/lineNew.lin",tr("lines (*.lin)"));
         if(!fileName.isEmpty())

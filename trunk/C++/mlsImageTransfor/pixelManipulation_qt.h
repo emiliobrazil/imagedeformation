@@ -17,7 +17,7 @@
 #include <vector>
 
 //typedef Wendland31<real,2> kernel;
-//typedef LinearMLSVF<real,2,kernel> vector_field;
+//typedef MLSVF<real,2,kernel> vector_field;
 typedef Wendland31<real,2> kernel;
 typedef LinearMLSVF<real,2,kernel> vector_field;
 
@@ -38,6 +38,9 @@ real maximum( real x , real y);
 real minimum( real x , real y);
 
 Vector2D evalField( real x , real y , vector_field& field );
+
+void normalToShade( const QImage& normalImage , QImage& finalImage );
+void fromGradientToColor( QRgb& normal, real dx, real dy );
 
 
 #endif // PIXELMANIPULATION_QT_H
